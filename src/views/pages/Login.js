@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import {
   CButton,
   CCard,
@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { gql, useMutation } from '@apollo/client'
+import { AuthContext } from 'src/context/auth'
 
 const LOGIN = gql`
   mutation Login($input: LoginInput) {
@@ -30,6 +31,7 @@ const LOGIN = gql`
 `
 
 const Login = () => {
+  const context = useContext(AuthContext)
   const [values, setValues] = useState({
     username: '',
     password: '',
@@ -44,14 +46,14 @@ const Login = () => {
   let navigate = useNavigate()
 
   const [login] = useMutation(LOGIN, {
-    // update(_, { data: { login: userDataAdmin } }) {
-    //   context.login(userDataAdmin)
-    //   history.push('/')
-    // },
-    onCompleted: (data) => {
-      console.log(data.login)
+    update(_, { data: { login: userDataAdmin } }) {
+      context.login(userDataAdmin)
       navigate('/')
     },
+    // onCompleted: (data) => {
+    //   console.log(data.login)
+    //   navigate('/')
+    // },
     onError(err) {
       toast.error(err.graphQLErrors[0].message)
     },
