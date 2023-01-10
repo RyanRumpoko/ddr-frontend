@@ -129,7 +129,7 @@ const Login = () => {
                   </CForm>
                   <CRow>
                     <CCol md="12" className="mt-2">
-                      <span className="float-right">Ver. {process.env.REACT_APP_VERSION}</span>
+                      <span className="float-end">Ver. {process.env.REACT_APP_VERSION}</span>
                     </CCol>
                   </CRow>
                 </CCardBody>

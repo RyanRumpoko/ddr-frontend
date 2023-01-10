@@ -1,12 +1,5 @@
 import React, { createContext, useReducer } from 'react'
-import { useMutation, gql } from '@apollo/client'
 import jwtDecode from 'jwt-decode'
-
-const LOGOUT = gql`
-  mutation logout($id: ID!) {
-    logout(logoutInput: { _id: $id })
-  }
-`
 
 let initialState = {
   user: null,
@@ -14,18 +7,13 @@ let initialState = {
 
 if (localStorage.getItem('jwtToken')) {
   const decodedToken = jwtDecode(localStorage.getItem('jwtToken'))
-
-  initialState = {
-    user: decodedToken,
+  if (decodedToken.exp * 2000 < Date.now()) {
+    localStorage.removeItem('jwtToken')
+  } else {
+    initialState = {
+      user: decodedToken,
+    }
   }
-  // if (decodedToken.exp * 1000 < Date.now()) {
-  //   RemoveRefreshToken(decodedToken._id)
-  //   localStorage.removeItem('jwtToken')
-  // } else {
-  //   initialState = {
-  //     user: decodedToken
-  //   }
-  // }
 }
 
 const AuthContext = createContext({
@@ -57,7 +45,6 @@ function AuthProvider(props) {
   function login(userData) {
     initialState.user = userData
     localStorage.setItem('jwtToken', initialState.user.token)
-    // localStorage.setItem('refreshToken', initialState.user.refreshToken)
     dispatch({
       type: 'LOGIN',
       payload: userData,
@@ -79,18 +66,6 @@ function AuthProvider(props) {
       {...props}
     />
   )
-}
-
-async function RemoveRefreshToken(userId) {
-  const [signout] = useMutation(LOGOUT)
-
-  try {
-    await signout({
-      variables: { id: userId },
-    })
-  } catch (error) {
-    console.log(error)
-  }
 }
 
 export { AuthContext, AuthProvider }
