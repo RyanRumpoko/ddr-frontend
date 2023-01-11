@@ -1,6 +1,21 @@
-import React, { useContext, useState } from 'react'
-import { CButton, CCard, CCardBody, CCardHeader, CCol, CRow, CTable } from '@coreui/react'
+import React, { useState } from 'react'
+import {
+  CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCol,
+  CRow,
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+} from '@coreui/react'
 import { useQuery, gql } from '@apollo/client'
+
+import AddUserModal from './AddUserModal'
 
 const GET_ALL_USERS = gql`
   query GetAllUsers {
@@ -13,18 +28,11 @@ const GET_ALL_USERS = gql`
 
 const UsersList = () => {
   const [userList, setUserList] = useState([])
+  const [userModal, setUserModal] = useState(false)
 
   const { loading } = useQuery(GET_ALL_USERS, {
     onCompleted: (data) => {
-      const tableTemplate = data.getAllUsers.map((item, idx) => {
-        return {
-          index: idx + 1,
-          username: item.username,
-          role: item.role ? item.role : '-',
-          _cellProps: { action: actionHandler() },
-        }
-      })
-      setUserList(tableTemplate)
+      setUserList(data.getAllUsers)
     },
     onError(err) {
       console.log(err)
@@ -32,30 +40,8 @@ const UsersList = () => {
     fetchPolicy: 'cache-and-network',
   })
 
-  const columns = [
-    { key: 'index', label: '#', _props: { scope: 'col' } },
-    { key: 'username', label: 'Username', _props: { scope: 'col' } },
-    { key: 'role', label: 'Role', _props: { scope: 'col' } },
-    { key: 'action', label: 'Action', _props: { scope: 'col' } },
-  ]
-  const actionHandler = () => {
-    return (
-      <td className="py-2">
-        <CButton
-          color="primary"
-          variant="outline"
-          shape="square"
-          size="md"
-          className="mr-1"
-          onClick={() => {}}
-        >
-          Detail
-        </CButton>
-      </td>
-    )
-  }
   const addNewUserModal = () => {
-    console.log('Yahu')
+    setUserModal(!userModal)
   }
   return (
     <CCard>
@@ -73,12 +59,47 @@ const UsersList = () => {
           </CRow>
           <CRow>
             <CCol lg="12">
-              <div className="mt-2 float-end">Total data: 100</div>
+              {userList && <div className="mt-2 float-end">Total data: {userList.length}</div>}
             </CCol>
           </CRow>
-          {!loading && <CTable columns={columns} items={userList} />}
+          <CTable>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Username</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Role</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {!loading &&
+                userList &&
+                userList.length !== 0 &&
+                userList.map((item, idx) => (
+                  <CTableRow key={item._id}>
+                    <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                    <CTableDataCell>{item.username}</CTableDataCell>
+                    <CTableDataCell>{item.role ? item.role : ''}</CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        color="primary"
+                        variant="outline"
+                        shape="square"
+                        size="sm"
+                        className="mr-1"
+                        onClick={() => {}}
+                      >
+                        Detail
+                      </CButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+            </CTableBody>
+          </CTable>
+          {!loading && userList.length === 0 && <div className="text-center">No Data</div>}
         </CCol>
       </CCardBody>
+      <AddUserModal userModal={userModal} setUserModal={setUserModal} />
     </CCard>
   )
 }
