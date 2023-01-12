@@ -27,8 +27,8 @@ const ADD_USER = gql`
 const AddUserModal = ({ userModal, setUserModal }) => {
   const [values, setValues] = useState({
     username: '',
-    password: '',
     role: '',
+    password: '',
     confirm_password: '',
   })
 
@@ -73,6 +73,7 @@ const AddUserModal = ({ userModal, setUserModal }) => {
             input: {
               username: values.username.toString().trim().toLowerCase(),
               password: values.password,
+              role: values.role,
             },
           },
         })
@@ -80,7 +81,6 @@ const AddUserModal = ({ userModal, setUserModal }) => {
           username: '',
           password: '',
           confirm_password: '',
-          dailyTargetCount: 0,
         })
         toast.success('Admin added !')
         // setRefreshTrigger(true)

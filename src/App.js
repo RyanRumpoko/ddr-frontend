@@ -3,6 +3,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom'
 import './scss/style.scss'
 
 import { AuthProvider } from './context/auth'
+import { AuthRoute, AuthLogin } from './util/AuthRoute'
 
 const loading = (
   <div className="pt-3 text-center">
@@ -25,10 +26,27 @@ class App extends Component {
         <HashRouter>
           <Suspense fallback={loading}>
             <Routes>
-              <Route exact path="/login" name="Login Page" element={<Login />} />
+              <Route
+                exact
+                path="/login"
+                name="Login Page"
+                element={
+                  <AuthLogin>
+                    <Login />
+                  </AuthLogin>
+                }
+              />
               <Route exact path="/404" name="Page 404" element={<Page404 />} />
               <Route exact path="/500" name="Page 500" element={<Page500 />} />
-              <Route path="*" name="Home" element={<DefaultLayout />} />
+              <Route
+                path="*"
+                name="Home"
+                element={
+                  <AuthRoute>
+                    <DefaultLayout />
+                  </AuthRoute>
+                }
+              />
             </Routes>
           </Suspense>
         </HashRouter>
