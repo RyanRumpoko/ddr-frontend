@@ -1,6 +1,7 @@
 import React, { Component, Suspense } from 'react'
 import { HashRouter, Route, Routes } from 'react-router-dom'
 import './scss/style.scss'
+import '@fortawesome/fontawesome-free/css/all.min.css'
 
 import { AuthProvider } from './context/auth'
 import { AuthRoute, AuthLogin } from './util/AuthRoute'
