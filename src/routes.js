@@ -51,7 +51,7 @@ const Toasts = React.lazy(() => import('./views/notifications/toasts/Toasts'))
 const Widgets = React.lazy(() => import('./views/widgets/Widgets'))
 
 const Users = React.lazy(() => import('./views/users/UsersList'))
-const Customers = React.lazy(() => import('./views/customers/CustomersLIst'))
+const Customers = React.lazy(() => import('./views/customers/CustomersList'))
 const AddCustomer = React.lazy(() => import('./views/customers/AddCustomer'))
 
 const routes = [

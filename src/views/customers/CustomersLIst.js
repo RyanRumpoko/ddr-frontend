@@ -21,23 +21,21 @@ const CustomersList = () => {
       <CCardHeader>
         <h3>Customer List</h3>
       </CCardHeader>
-      <CCardBody className="px-5">
+      <CCardBody>
         <CForm onSubmit={onSubmit}>
           <CRow className="my-3">
-            <CCol lg="2">Name</CCol>
+            <CCol lg="2">Nama</CCol>
             <CCol lg="4">
               <CFormInput
-                size="md"
                 type="text"
                 name="customer_name"
                 values={searchValues.name}
                 onChange={(e) => onChange(e)}
               />
             </CCol>
-            <CCol lg="2">Phone Number</CCol>
+            <CCol lg="2">Nomor Telepon</CCol>
             <CCol lg="4">
               <CFormInput
-                size="md"
                 type="text"
                 name="phone_number"
                 values={searchValues.phone_number}
@@ -45,24 +43,42 @@ const CustomersList = () => {
               />
             </CCol>
           </CRow>
-          <CRow className="my-3">
-            <CCol lg="2">Car Brand</CCol>
+          <CRow className="mt-5 mb-3">
+            <CCol lg="2">Merk</CCol>
             <CCol lg="4">
               <CFormInput
-                size="md"
                 type="text"
-                name="car_brand"
-                values={searchValues.car_brand}
+                name="brand"
+                values={searchValues.brand}
                 onChange={(e) => onChange(e)}
               />
             </CCol>
-            <CCol lg="2">Car Type</CCol>
+            <CCol lg="2">Tipe</CCol>
             <CCol lg="4">
               <CFormInput
-                size="md"
                 type="text"
-                name="car_type"
-                values={searchValues.car_type}
+                name="type"
+                values={searchValues.type}
+                onChange={(e) => onChange(e)}
+              />
+            </CCol>
+          </CRow>
+          <CRow className="my-3">
+            <CCol lg="2">Tahun</CCol>
+            <CCol lg="4">
+              <CFormInput
+                type="text"
+                name="year"
+                values={searchValues.year}
+                onChange={(e) => onChange(e)}
+              />
+            </CCol>
+            <CCol lg="2">Transmisi</CCol>
+            <CCol lg="4">
+              <CFormInput
+                type="text"
+                name="transmission"
+                values={searchValues.transmission}
                 onChange={(e) => onChange(e)}
               />
             </CCol>
