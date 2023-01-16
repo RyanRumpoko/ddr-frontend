@@ -24,7 +24,7 @@ const ADD_USER = gql`
   }
 `
 
-const AddUserModal = ({ userModal, setUserModal }) => {
+const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
   const [values, setValues] = useState({
     username: '',
     role: '',
@@ -67,7 +67,6 @@ const AddUserModal = ({ userModal, setUserModal }) => {
       notify()
     } else {
       try {
-        console.log(values)
         await addNewUser({
           variables: {
             input: {
@@ -82,16 +81,10 @@ const AddUserModal = ({ userModal, setUserModal }) => {
           password: '',
           confirm_password: '',
         })
-        toast.success('Admin added !')
-        // setRefreshTrigger(true)
+        setRefreshTrigger(true)
         setUserModal(false)
       } catch (error) {
-        if (error.graphQLErrors[0].extensions.errors.username)
-          toast.error(error.graphQLErrors[0].extensions.errors.username)
-        else if (error.graphQLErrors[0].extensions.errors.role)
-          toast.error(error.graphQLErrors[0].extensions.errors.role)
-        else if (error.graphQLErrors[0].extensions.errors.password)
-          toast.error(error.graphQLErrors[0].extensions.errors.password)
+        toast.error(error.graphQLErrors[0].message)
       }
     }
   }
