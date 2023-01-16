@@ -14,6 +14,7 @@ import {
   CTableDataCell,
 } from '@coreui/react'
 import { useQuery, gql } from '@apollo/client'
+import { toast, ToastContainer } from 'react-toastify'
 
 import AddUserModal from './AddUserModal'
 
@@ -29,8 +30,9 @@ const GET_ALL_USERS = gql`
 const UsersList = () => {
   const [userList, setUserList] = useState([])
   const [userModal, setUserModal] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(false)
 
-  const { loading } = useQuery(GET_ALL_USERS, {
+  const { loading, refetch } = useQuery(GET_ALL_USERS, {
     onCompleted: (data) => {
       setUserList(data.getAllUsers)
     },
@@ -42,6 +44,11 @@ const UsersList = () => {
 
   const addNewUserModal = () => {
     setUserModal(!userModal)
+  }
+  if (refreshTrigger) {
+    refetch()
+    setRefreshTrigger(false)
+    toast.success('Admin added !')
   }
   return (
     <CCard>
@@ -79,7 +86,7 @@ const UsersList = () => {
                   <CTableRow key={item._id}>
                     <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
                     <CTableDataCell>{item.username}</CTableDataCell>
-                    <CTableDataCell>{item.role ? item.role : ''}</CTableDataCell>
+                    <CTableDataCell>{item.role ? item.role : '-'}</CTableDataCell>
                     <CTableDataCell>
                       <CButton
                         color="primary"
@@ -99,7 +106,14 @@ const UsersList = () => {
           {!loading && userList.length === 0 && <div className="text-center">No Data</div>}
         </CCol>
       </CCardBody>
-      <AddUserModal userModal={userModal} setUserModal={setUserModal} />
+      {userModal && (
+        <AddUserModal
+          userModal={userModal}
+          setUserModal={setUserModal}
+          setRefreshTrigger={setRefreshTrigger}
+        />
+      )}
+      <ToastContainer />
     </CCard>
   )
 }

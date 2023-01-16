@@ -50,10 +50,6 @@ const Login = () => {
       context.login(userDataAdmin)
       navigate('/')
     },
-    // onCompleted: (data) => {
-    //   console.log(data.login)
-    //   navigate('/')
-    // },
     onError(err) {
       toast.error(err.graphQLErrors[0].message)
     },
