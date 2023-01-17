@@ -89,7 +89,7 @@ const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
     }
   }
   return (
-    <CModal visible={userModal} onClose={() => setUserModal(false)}>
+    <CModal visible={userModal} onClose={() => setUserModal(false)} backdrop="static">
       <CModalHeader closeButton>
         <CModalTitle>Add New User</CModalTitle>
       </CModalHeader>
