@@ -1,7 +1,22 @@
 import React, { useState, useEffect } from 'react'
+import {
+  CButton,
+  CCard,
+  CCardBody,
+  CCardHeader,
+  CCol,
+  CRow,
+  CTable,
+  CTableHead,
+  CTableRow,
+  CTableHeaderCell,
+  CTableBody,
+  CTableDataCell,
+} from '@coreui/react'
 import { useLocation } from 'react-router-dom'
-import { useQuery, useLazyQuery, gql } from '@apollo/client'
+import { useLazyQuery, gql } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
+import AddInvoiceModal from './AddInvoiceModal'
 
 const GET_INVOICES_BY_CUSTOMER_ID = gql`
   query GetInvoiceByCustomerId($id: ID) {
@@ -15,6 +30,7 @@ const GET_INVOICES_BY_CUSTOMER_ID = gql`
 const Invoices = () => {
   const { state } = useLocation()
   const [invoiceList, setInvoiceList] = useState([])
+  const [invoiceModal, setInvoiceModal] = useState(false)
 
   let navigate = useNavigate()
 
@@ -38,9 +54,90 @@ const Invoices = () => {
         },
       })
     }
+    // eslint-disable-next-line
   }, [])
 
-  return <div>Invoices</div>
+  const addNewInvoiceModal = () => {
+    setInvoiceModal(!invoiceModal)
+  }
+
+  return (
+    <CCard className="mt-3">
+      <CCardHeader>
+        <h3>List Invoice </h3>
+      </CCardHeader>
+      <CCardBody>
+        <CRow className="justify-content-center">
+          <CCol lg="6">
+            <CButton onClick={addNewInvoiceModal} color="primary" className="mb-4 col-12">
+              Tambah Invoice
+            </CButton>
+          </CCol>
+        </CRow>
+        <CRow>
+          <CCol lg="12">
+            {invoiceList && <div className="mt-2 float-end">Total data: {invoiceList.length}</div>}
+          </CCol>
+        </CRow>
+        <CTable>
+          <CTableHead>
+            <CTableRow>
+              <CTableHeaderCell scope="col">#</CTableHeaderCell>
+              <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
+              <CTableHeaderCell scope="col"></CTableHeaderCell>
+            </CTableRow>
+          </CTableHead>
+          <CTableBody>
+            {!loading &&
+              invoiceList &&
+              invoiceList.length !== 0 &&
+              invoiceList.map((item, idx) => (
+                <CTableRow key={item._id}>
+                  <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                  <CTableDataCell>{item.invoice_number}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton
+                      color="warning"
+                      variant="outline"
+                      shape="square"
+                      size="sm"
+                      className="mr-1"
+                      // onClick={() => {
+                      //   invoiceListHandler(item)
+                      // }}
+                    >
+                      Edit
+                    </CButton>
+                    <CButton
+                      color="primary"
+                      variant="outline"
+                      shape="square"
+                      size="sm"
+                      className="mr-1"
+                      // onClick={() => {
+                      //   invoiceListHandler(item)
+                      // }}
+                    >
+                      Detail
+                    </CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+          </CTableBody>
+        </CTable>
+        {!loading && invoiceList.length === 0 && (
+          <div className="text-center text-danger">Belum ada data</div>
+        )}
+      </CCardBody>
+      {invoiceModal && (
+        <AddInvoiceModal
+          invoiceModal={invoiceModal}
+          setInvoiceModal={setInvoiceModal}
+          id={state._id}
+        />
+      )}
+    </CCard>
+  )
 }
 
 export default Invoices
