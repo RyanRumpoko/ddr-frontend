@@ -10,6 +10,13 @@ import {
   CCol,
   CButton,
 } from '@coreui/react'
+import { gql, useMutation } from '@apollo/client'
+
+const ADD_INVOICE = gql`
+  mutation AddInvoice($input: InvoiceInput) {
+    addUser(input: $input)
+  }
+`
 
 const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
   const [values, setValues] = useState({
@@ -26,7 +33,8 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
       status: 'estimated',
     },
   ])
-  const [countQty, setCountQty] = useState()
+
+  const [addNewInvoice] = useMutation(ADD_INVOICE)
 
   const addFormFields = () => {
     setArrayInput([
@@ -34,24 +42,23 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
       { service_name: '', quantity: 0, price: 0, total: 0, status: 'estimated' },
     ])
   }
-  const calculateTotal = (i, e) => {
-    if (e.target.name === 'quantity') {
-      setCountQty(e.target.value)
-    } else {
-      let newValues = [...arrayInput]
-      newValues[i]['total'] = e.target.value * countQty
-      setArrayInput(newValues)
-    }
+  const removeFormFields = (i) => {
+    let newValues = [...arrayInput]
+    newValues.splice(i, 1)
+    setArrayInput(newValues)
   }
   const onChange = (i, e) => {
     let newValues = [...arrayInput]
     newValues[i][e.target.name] = e.target.value
-    // newValues[i]['total'] = newValues[i]['quantity'] * newValues[i]['price']
+    newValues[i]['total'] = newValues[i]['quantity'] * newValues[i]['price']
     setArrayInput(newValues)
   }
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
-    console.log(arrayInput)
+    setValues({ ...values, service_bulk: arrayInput })
+
+    console.log(values, 'Ini Values')
+    console.log(arrayInput, 'Ini Array Input')
   }
   return (
     <CModal
@@ -67,61 +74,65 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
         <CForm onSubmit={onSubmit}>
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
-              <CCol md="4">
+              <CCol sm="3" className="pb-2">
                 <CFormInput
                   type="text"
                   placeholder="Nama Barang"
                   name="service_name"
                   values={el.service_name}
                   onChange={(e) => onChange(idx, e)}
+                  required
                 />
               </CCol>
-              <CCol md="2">
+              <CCol sm="2" className="pb-2">
                 <CFormInput
-                  id="1"
                   type="text"
                   placeholder="Jumlah"
                   name="quantity"
                   values={el.quantity}
                   onChange={(e) => onChange(idx, e)}
-                  onBlur={(e) => calculateTotal(idx, e)}
+                  required
                 />
               </CCol>
-              <CCol md="3">
+              <CCol sm="3" className="pb-2">
                 <CFormInput
-                  id="1"
                   type="text"
                   placeholder="Harga"
                   name="price"
                   values={el.price}
                   onChange={(e) => onChange(idx, e)}
-                  onBlur={(e) => calculateTotal(idx, e)}
+                  required
                 />
               </CCol>
-              <CCol md="3">
-                <CFormInput
-                  id="3"
-                  type="text"
-                  placeholder="Total"
-                  name="total"
-                  values={el.total}
-                  onChange={(e) => onChange(idx, e)}
-                  disabled
-                />
+              <CCol sm="3">
+                <div className="py-2 text-bold">
+                  {el.total.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}
+                </div>
+              </CCol>
+              <CCol sm="1">
+                <button
+                  className="py-2"
+                  style={{ border: 'none', backgroundColor: ' transparent' }}
+                  onClick={() => removeFormFields(idx)}
+                  type="button"
+                >
+                  <i className="fas fa-minus-circle fa-lg"></i>
+                </button>
               </CCol>
             </CRow>
           ))}
           <CRow className="justify-content-center">
-            <CCol md="6">
-              <CButton
-                color="primary"
-                className="col-12 text-white"
+            <CCol sm="6" className="mb-3 text-center">
+              <button
+                style={{ border: 'none', backgroundColor: ' transparent' }}
                 onClick={() => addFormFields()}
               >
-                Tambah Barang
-              </CButton>
+                <i className="fas fa-plus-circle fa-lg"></i>
+              </button>
             </CCol>
-            <CCol md="6">
+          </CRow>
+          <CRow className="justify-content-center">
+            <CCol sm="6">
               <CButton color="success" type="submit" className="col-12 text-white">
                 Buat Invoice
               </CButton>
