@@ -8,10 +8,8 @@ let initialState = {
 if (localStorage.getItem('jwtToken')) {
   const decodedToken = jwtDecode(localStorage.getItem('jwtToken'))
   if (decodedToken.exp * 1000 < Date.now()) {
-    console.log('Masuk expired')
     localStorage.removeItem('jwtToken')
   } else {
-    console.log('Masuk oke')
     initialState = {
       user: decodedToken,
     }

@@ -17,26 +17,44 @@ import { useLocation } from 'react-router-dom'
 import { useLazyQuery, gql } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
 import AddInvoiceModal from './AddInvoiceModal'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const GET_INVOICES_BY_CUSTOMER_ID = gql`
   query GetInvoiceByCustomerId($id: ID) {
     getInvoiceByCustomerId(id: $id) {
       _id
       invoice_number
+      status
     }
   }
 `
+
+const getStatus = (status) => {
+  switch (status) {
+    case 'estimated':
+      return 'Estimasi'
+    case 'ongoing':
+      return 'Dikerjakan'
+    case 'done':
+      return 'Selesai'
+    case 'canceled':
+      return 'Dibatalkan'
+    default:
+      return ''
+  }
+}
 
 const Invoices = () => {
   const { state } = useLocation()
   const [invoiceList, setInvoiceList] = useState([])
   const [invoiceModal, setInvoiceModal] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(false)
 
   let navigate = useNavigate()
 
-  const [getInvoices, { loading }] = useLazyQuery(GET_INVOICES_BY_CUSTOMER_ID, {
+  const [getInvoices, { loading, refetch }] = useLazyQuery(GET_INVOICES_BY_CUSTOMER_ID, {
     onCompleted: (data) => {
-      console.log(data.getInvoiceByCustomerId)
       setInvoiceList(data.getInvoiceByCustomerId)
     },
     onError(err) {
@@ -59,6 +77,11 @@ const Invoices = () => {
 
   const addNewInvoiceModal = () => {
     setInvoiceModal(!invoiceModal)
+  }
+  if (refreshTrigger) {
+    refetch()
+    setRefreshTrigger(false)
+    toast.success('Invoice berhasi dibuat')
   }
 
   return (
@@ -84,6 +107,7 @@ const Invoices = () => {
             <CTableRow>
               <CTableHeaderCell scope="col">#</CTableHeaderCell>
               <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
+              <CTableHeaderCell scope="col">Status</CTableHeaderCell>
               <CTableHeaderCell scope="col"></CTableHeaderCell>
             </CTableRow>
           </CTableHead>
@@ -95,13 +119,13 @@ const Invoices = () => {
                 <CTableRow key={item._id}>
                   <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
                   <CTableDataCell>{item.invoice_number}</CTableDataCell>
+                  <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
                   <CTableDataCell>
                     <CButton
                       color="warning"
                       variant="outline"
                       shape="square"
                       size="sm"
-                      className="mr-1"
                       // onClick={() => {
                       //   invoiceListHandler(item)
                       // }}
@@ -113,7 +137,7 @@ const Invoices = () => {
                       variant="outline"
                       shape="square"
                       size="sm"
-                      className="mr-1"
+                      className="mx-1"
                       // onClick={() => {
                       //   invoiceListHandler(item)
                       // }}
@@ -134,8 +158,10 @@ const Invoices = () => {
           invoiceModal={invoiceModal}
           setInvoiceModal={setInvoiceModal}
           id={state._id}
+          setRefreshTrigger={setRefreshTrigger}
         />
       )}
+      <ToastContainer />
     </CCard>
   )
 }
