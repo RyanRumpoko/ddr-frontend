@@ -3,6 +3,7 @@ import {
   CForm,
   CFormInput,
   CFormLabel,
+  CFormSelect,
   CModal,
   CModalBody,
   CModalHeader,
@@ -107,12 +108,17 @@ const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
             <small className="form-text text-danger ml-2">*Required</small>
           </div>
           <div className="form-group mb-3">
-            <label>Role</label>
-            <select className="form-control" name="role" value={values.role} onChange={onChange}>
-              <option value="">- Select Role -</option>
-              <option value="superadmin">Superadmin</option>
-              <option value="admin">Admin</option>
-            </select>
+            <CFormLabel>Role</CFormLabel>
+            <CFormSelect
+              name="role"
+              value={values.role}
+              onChange={onChange}
+              options={[
+                '- Select Role -',
+                { label: 'Superadmin', value: 'superadmin' },
+                { label: 'Admin', value: 'admin' },
+              ]}
+            ></CFormSelect>
             <small className="form-text text-danger ml-2">*Required</small>
           </div>
           <div className="form-group mb-3">

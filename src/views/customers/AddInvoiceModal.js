@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CForm,
   CFormInput,
+  CFormSelect,
   CModal,
   CModalBody,
   CModalHeader,
@@ -10,15 +11,23 @@ import {
   CCol,
   CButton,
 } from '@coreui/react'
-import { gql, useMutation } from '@apollo/client'
+import { gql, useLazyQuery, useMutation } from '@apollo/client'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const ADD_INVOICE = gql`
   mutation AddInvoice($input: InvoiceInput) {
-    addUser(input: $input)
+    addInvoice(input: $input)
+  }
+`
+const GET_INVOICE_BY_MONTH = gql`
+  query GetInvoiceByMonth($input: GetAllInvoiceByMonth) {
+    getAllInvoicesByMonth(input: $input)
   }
 `
 
-const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
+const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger }) => {
+  const date = new Date()
   const [values, setValues] = useState({
     invoice_number: '',
     service_bulk: [],
@@ -30,17 +39,39 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
       quantity: 0,
       price: 0,
       total: 0,
-      status: 'estimated',
     },
   ])
+  const romanNumeral = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
 
   const [addNewInvoice] = useMutation(ADD_INVOICE)
+  const [getInvoiceByMonth] = useLazyQuery(GET_INVOICE_BY_MONTH, {
+    onCompleted: (data) => {
+      const invoice_number = data.getAllInvoicesByMonth + 1
+      const month = date.getMonth()
+      const year = date.getFullYear().toString().slice(2)
+      const monthInRoman = romanNumeral[month]
+      setValues({ ...values, invoice_number: `${invoice_number}/DDR/${monthInRoman}/${year}` })
+    },
+    onError(err) {
+      console.log(err)
+    },
+    fetchPolicy: 'cache-and-network',
+  })
+
+  useEffect(() => {
+    const monthStart = date.toISOString().slice(0, 7)
+    getInvoiceByMonth({
+      variables: {
+        input: {
+          this_month: monthStart,
+        },
+      },
+    })
+    // eslint-disable-next-line
+  }, [])
 
   const addFormFields = () => {
-    setArrayInput([
-      ...arrayInput,
-      { service_name: '', quantity: 0, price: 0, total: 0, status: 'estimated' },
-    ])
+    setArrayInput([...arrayInput, { service_name: '', quantity: 0, price: 0, total: 0 }])
   }
   const removeFormFields = (i) => {
     let newValues = [...arrayInput]
@@ -49,16 +80,26 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
   }
   const onChange = (i, e) => {
     let newValues = [...arrayInput]
-    newValues[i][e.target.name] = e.target.value
+    if (e.target.name === 'service_name') {
+      newValues[i]['service_name'] = e.target.value
+    } else newValues[i][e.target.name] = Number(e.target.value)
     newValues[i]['total'] = newValues[i]['quantity'] * newValues[i]['price']
     setArrayInput(newValues)
   }
   const onSubmit = async (e) => {
     e.preventDefault()
-    setValues({ ...values, service_bulk: arrayInput })
 
-    console.log(values, 'Ini Values')
-    console.log(arrayInput, 'Ini Array Input')
+    try {
+      await addNewInvoice({
+        variables: {
+          input: { ...values, service_bulk: arrayInput },
+        },
+      })
+      setRefreshTrigger(true)
+      setInvoiceModal(false)
+    } catch (error) {
+      toast.error(error.graphQLErrors[0].message)
+    }
   }
   return (
     <CModal
@@ -75,21 +116,33 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
               <CCol sm="3" className="pb-2">
-                <CFormInput
+                <div className="form-group mb-3">
+                  <CFormSelect
+                    name="service_name"
+                    value={el.service_name}
+                    onChange={(e) => onChange(idx, e)}
+                    options={[
+                      '- Pilih Service -',
+                      { label: 'Rack Steer', value: 'rack steer' },
+                      { label: 'Ball Joint', value: 'ball joint' },
+                    ]}
+                  />
+                </div>
+                {/* <CFormInput
                   type="text"
                   placeholder="Nama Barang"
                   name="service_name"
-                  values={el.service_name}
+                  value={el.service_name}
                   onChange={(e) => onChange(idx, e)}
                   required
-                />
+                /> */}
               </CCol>
               <CCol sm="2" className="pb-2">
                 <CFormInput
                   type="text"
                   placeholder="Jumlah"
                   name="quantity"
-                  values={el.quantity}
+                  value={el.quantity}
                   onChange={(e) => onChange(idx, e)}
                   required
                 />
@@ -99,7 +152,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
                   type="text"
                   placeholder="Harga"
                   name="price"
-                  values={el.price}
+                  value={el.price}
                   onChange={(e) => onChange(idx, e)}
                   required
                 />
@@ -140,7 +193,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id }) => {
           </CRow>
         </CForm>
       </CModalBody>
-      {/* <ToastContainer /> */}
+      <ToastContainer />
     </CModal>
   )
 }
