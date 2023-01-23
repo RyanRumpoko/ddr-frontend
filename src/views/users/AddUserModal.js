@@ -92,15 +92,15 @@ const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
   return (
     <CModal visible={userModal} onClose={() => setUserModal(false)} backdrop="static">
       <CModalHeader closeButton>
-        <CModalTitle>Add New User</CModalTitle>
+        <CModalTitle>Tambah User Baru</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CForm onSubmit={onSubmit}>
           <div className="form-group mb-3">
-            <CFormLabel>Username</CFormLabel>
+            <CFormLabel>Nama User</CFormLabel>
             <CFormInput
               type="text"
-              placeholder="Username"
+              placeholder="Nama user"
               name="username"
               value={values.username}
               onChange={onChange}
@@ -133,10 +133,10 @@ const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
             <small className="form-text text-danger ml-2">*Required</small>
           </div>
           <div className="form-group mb-3">
-            <CFormLabel>Confirm Password</CFormLabel>
+            <CFormLabel>Ulangi Password</CFormLabel>
             <CFormInput
               type="password"
-              placeholder="Confirm Password"
+              placeholder="Ulangi Password"
               name="confirm_password"
               value={values.confirm_password}
               onChange={onChange}
@@ -146,7 +146,7 @@ const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
           <CRow className="justify-content-center">
             <CCol md="6">
               <CButton color="success" type="submit" className="col-12 text-white">
-                Create
+                Tambah
               </CButton>
             </CCol>
           </CRow>
