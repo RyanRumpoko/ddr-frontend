@@ -53,14 +53,14 @@ const UsersList = () => {
   return (
     <CCard>
       <CCardHeader>
-        <h3>Users List</h3>
+        <h3>List Users</h3>
       </CCardHeader>
       <CCardBody>
         <CCol>
           <CRow className="justify-content-center">
             <CCol lg="6">
               <CButton onClick={addNewUserModal} color="primary" className="mb-4 col-12">
-                Add New User
+                Tambah User Baru
               </CButton>
             </CCol>
           </CRow>
@@ -73,9 +73,9 @@ const UsersList = () => {
             <CTableHead>
               <CTableRow>
                 <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Username</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Nama User</CTableHeaderCell>
                 <CTableHeaderCell scope="col">Role</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Action</CTableHeaderCell>
+                <CTableHeaderCell scope="col"></CTableHeaderCell>
               </CTableRow>
             </CTableHead>
             <CTableBody>

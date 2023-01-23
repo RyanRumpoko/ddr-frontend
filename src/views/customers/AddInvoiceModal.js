@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
   CForm,
   CFormInput,
-  CFormSelect,
+  // CFormSelect,
   CModal,
   CModalBody,
   CModalHeader,
@@ -25,6 +25,15 @@ const GET_INVOICE_BY_MONTH = gql`
     getAllInvoicesByMonth(input: $input)
   }
 `
+const GET_ALL_SETTING_SERVICE = gql`
+  query GetAllSettingService {
+    getAllSettingService {
+      _id
+      service_name
+      base_price
+    }
+  }
+`
 
 const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger }) => {
   const date = new Date()
@@ -41,6 +50,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
       total: 0,
     },
   ])
+  const [settingServiceList, setSettingServiceList] = useState([])
   const romanNumeral = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
 
   const [addNewInvoice] = useMutation(ADD_INVOICE)
@@ -57,6 +67,15 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     },
     fetchPolicy: 'cache-and-network',
   })
+  const [getAllSettingService] = useLazyQuery(GET_ALL_SETTING_SERVICE, {
+    onCompleted: (data) => {
+      setSettingServiceList(data.getAllSettingService)
+    },
+    onError(err) {
+      console.log(err)
+    },
+    fetchPolicy: 'cache-and-network',
+  })
 
   useEffect(() => {
     const monthStart = date.toISOString().slice(0, 7)
@@ -67,9 +86,13 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
         },
       },
     })
+    getAllSettingService()
     // eslint-disable-next-line
   }, [])
 
+  const capitalizeString = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
+  }
   const addFormFields = () => {
     setArrayInput([...arrayInput, { service_name: '', quantity: 0, price: 0, total: 0 }])
   }
@@ -82,7 +105,9 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     let newValues = [...arrayInput]
     if (e.target.name === 'service_name') {
       newValues[i]['service_name'] = e.target.value
-    } else newValues[i][e.target.name] = Number(e.target.value)
+    } else {
+      newValues[i][e.target.name] = Number(e.target.value)
+    }
     newValues[i]['total'] = newValues[i]['quantity'] * newValues[i]['price']
     setArrayInput(newValues)
   }
@@ -116,26 +141,35 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
               <CCol sm="3" className="pb-2">
-                <div className="form-group mb-3">
-                  <CFormSelect
-                    name="service_name"
-                    value={el.service_name}
-                    onChange={(e) => onChange(idx, e)}
-                    options={[
-                      '- Pilih Service -',
-                      { label: 'Rack Steer', value: 'rack steer' },
-                      { label: 'Ball Joint', value: 'ball joint' },
-                    ]}
-                  />
-                </div>
-                {/* <CFormInput
-                  type="text"
-                  placeholder="Nama Barang"
+                {/* <CFormSelect
                   name="service_name"
                   value={el.service_name}
                   onChange={(e) => onChange(idx, e)}
-                  required
+                  options={[
+                    '- Pilih Service -',
+                    { label: 'Rack Steer', value: 'rack steer' },
+                    { label: 'Ball Joint', value: 'ball joint' },
+                  ]}
                 /> */}
+                {settingServiceList && settingServiceList.length !== 0 && (
+                  <>
+                    <CFormInput
+                      list="dataService"
+                      placeholder="Nama Barang"
+                      name="service_name"
+                      value={el.service_name}
+                      onChange={(e) => onChange(idx, e)}
+                      required
+                    />
+                    <datalist id="dataService">
+                      {settingServiceList.map((item) => (
+                        <option key={item._id} value={item._service_name}>
+                          {capitalizeString(item.service_name)}
+                        </option>
+                      ))}
+                    </datalist>
+                  </>
+                )}
               </CCol>
               <CCol sm="2" className="pb-2">
                 <CFormInput

@@ -13,9 +13,8 @@ import {
   CTableBody,
   CTableDataCell,
 } from '@coreui/react'
-import { useLocation } from 'react-router-dom'
 import { useLazyQuery, gql } from '@apollo/client'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import AddInvoiceModal from './AddInvoiceModal'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -78,6 +77,9 @@ const Invoices = () => {
   const addNewInvoiceModal = () => {
     setInvoiceModal(!invoiceModal)
   }
+  const invoiceDetailHandler = (data) => {
+    navigate('/customers/list/invoices/detail', { state: data })
+  }
   if (refreshTrigger) {
     refetch()
     setRefreshTrigger(false)
@@ -138,9 +140,9 @@ const Invoices = () => {
                       shape="square"
                       size="sm"
                       className="mx-1"
-                      // onClick={() => {
-                      //   invoiceListHandler(item)
-                      // }}
+                      onClick={() => {
+                        invoiceDetailHandler(item)
+                      }}
                     >
                       Detail
                     </CButton>
