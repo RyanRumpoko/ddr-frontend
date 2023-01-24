@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   CAvatar,
   CDropdown,
@@ -12,7 +12,9 @@ import { cilSettings, cilAccountLogout } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { useMutation, gql } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify'
 import { AuthContext } from 'src/context/auth'
+import ChangePasswordModal from 'src/views/users/ChangePasswordModal'
 
 const LOGOUT = gql`
   mutation Logout($input: LogoutInput) {
@@ -22,8 +24,10 @@ const LOGOUT = gql`
 
 const AppHeaderDropdown = () => {
   const { user, logout } = useContext(AuthContext)
-
   let navigate = useNavigate()
+
+  const [modalChangePassword, setModalChangePassword] = useState(false)
+  const [toastTrigger, setToastTrigger] = useState(false)
 
   const [signout] = useMutation(LOGOUT)
 
@@ -36,7 +40,13 @@ const AppHeaderDropdown = () => {
       console.log(error)
     }
   }
-  const settingHandler = () => {}
+  const changePasswordHandler = () => {
+    setModalChangePassword(!modalChangePassword)
+  }
+  if (toastTrigger) {
+    toast.success('Password berhasih di ganti')
+    setToastTrigger(false)
+  }
 
   return (
     <CDropdown variant="nav-item">
@@ -47,16 +57,25 @@ const AppHeaderDropdown = () => {
       </CDropdownToggle>
       <CDropdownMenu className="pt-0" placement="bottom-end">
         <CDropdownHeader className="bg-light fw-semibold py-2">Account</CDropdownHeader>
-        <CDropdownItem onClick={settingHandler}>
+        <CDropdownItem onClick={changePasswordHandler}>
           <CIcon icon={cilSettings} className="me-2" />
-          Setting
+          Ganti Password
         </CDropdownItem>
         <CDropdownDivider />
         <CDropdownItem onClick={logoutHandler}>
           <CIcon icon={cilAccountLogout} className="me-2" />
           Logout
         </CDropdownItem>
+        {modalChangePassword && (
+          <ChangePasswordModal
+            modalChangePassword={modalChangePassword}
+            setModalChangePassword={setModalChangePassword}
+            _id={user._id}
+            setToastTrigger={setToastTrigger}
+          />
+        )}
       </CDropdownMenu>
+      <ToastContainer />
     </CDropdown>
   )
 }

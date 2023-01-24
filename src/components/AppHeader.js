@@ -7,13 +7,13 @@ import {
   CHeaderNav,
   CHeaderToggler,
   CNavItem,
+  CHeaderDivider,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilMenu } from '@coreui/icons'
-
 import { AppHeaderDropdown } from './header/index'
-
 import { AuthContext } from 'src/context/auth'
+import { AppBreadcrumb } from './index'
 
 const AppHeader = () => {
   const { user } = useContext(AuthContext)
@@ -50,6 +50,10 @@ const AppHeader = () => {
         <CHeaderNav className="ms-3">
           <AppHeaderDropdown />
         </CHeaderNav>
+      </CContainer>
+      <CHeaderDivider />
+      <CContainer fluid>
+        <AppBreadcrumb />
       </CContainer>
     </CHeader>
   )

@@ -26,6 +26,7 @@ const LOGIN = gql`
       _id
       username
       token
+      role
     }
   }
 `

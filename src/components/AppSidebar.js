@@ -27,7 +27,7 @@ const AppSidebar = () => {
     >
       <CSidebarBrand className="d-none d-md-flex" to="/">
         <h2 className="sidebar-brand-full">
-          <span className="text-danger">DDR</span> Motor
+          <span className="text-danger">DDR</span> Motor 126
         </h2>
         <h5 className="sidebar-brand-narrow">DDR</h5>
       </CSidebarBrand>

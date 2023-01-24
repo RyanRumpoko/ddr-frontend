@@ -63,7 +63,7 @@ const Invoices = () => {
   })
 
   useEffect(() => {
-    if (state === null) navigate('/404')
+    if (state === null) navigate('/')
     else {
       getInvoices({
         variables: {
