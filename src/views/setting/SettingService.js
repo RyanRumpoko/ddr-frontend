@@ -17,6 +17,8 @@ import {
   // CPaginationItem,
 } from '@coreui/react'
 import { useQuery, useLazyQuery, gql } from '@apollo/client'
+import AddSettingServiceModal from './AddSettingServiceModal'
+import { toast, ToastContainer } from 'react-toastify'
 
 const GET_ALL_SETTING_SERVICE_PAGINATION = gql`
   query GetAllSettingServicePagination($input: GetSettingServicePagination) {
@@ -39,6 +41,8 @@ const SettingService = () => {
   const [settingServiceList, setSettingServiceList] = useState([])
   // const [currentPage, setActivePage] = useState(1)
   // const [totalPage, setTotalPage] = useState(0)
+  const [settingServiceModal, setSettingServiceModal] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(false)
 
   const [getAllSetting, { loading }] = useLazyQuery(GET_ALL_SETTING_SERVICE_PAGINATION, {
     onCompleted: (data) => {
@@ -74,7 +78,22 @@ const SettingService = () => {
   const localString = (number) => {
     return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
   }
-  const addNewSettingService = () => {}
+  const addNewSettingService = () => {
+    setSettingServiceModal(!settingServiceModal)
+  }
+
+  if (refreshTrigger) {
+    getAllSetting({
+      variables: {
+        input: {
+          page: 1,
+          perPage: 100,
+        },
+      },
+    })
+    setRefreshTrigger(false)
+    toast.success('Setting service berhasil di tambahkan')
+  }
   return (
     <CCard className="mt-3">
       <CCardHeader>
@@ -136,6 +155,12 @@ const SettingService = () => {
           </CPagination>
         )}
       </CCardFooter> */}
+      <AddSettingServiceModal
+        settingServiceModal={settingServiceModal}
+        setSettingServiceModal={setSettingServiceModal}
+        setRefreshTrigger={setRefreshTrigger}
+      />
+      <ToastContainer />
     </CCard>
   )
 }

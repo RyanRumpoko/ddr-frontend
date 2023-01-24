@@ -15,7 +15,7 @@ import {
 } from '@coreui/react'
 import { useQuery, gql } from '@apollo/client'
 import { toast, ToastContainer } from 'react-toastify'
-
+import { useNavigate } from 'react-router-dom'
 import AddUserModal from './AddUserModal'
 
 const GET_ALL_USERS = gql`
@@ -28,6 +28,7 @@ const GET_ALL_USERS = gql`
 `
 
 const UsersList = () => {
+  const navigate = useNavigate()
   const [userList, setUserList] = useState([])
   const [userModal, setUserModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
@@ -45,10 +46,13 @@ const UsersList = () => {
   const addNewUserModal = () => {
     setUserModal(!userModal)
   }
+  const detailHandler = (data) => {
+    navigate('/users/detail', { state: data })
+  }
   if (refreshTrigger) {
     refetch()
     setRefreshTrigger(false)
-    toast.success('Admin added !')
+    toast.success('User berhasil di buat')
   }
   return (
     <CCard>
@@ -94,7 +98,9 @@ const UsersList = () => {
                         shape="square"
                         size="sm"
                         className="mr-1"
-                        onClick={() => {}}
+                        onClick={() => {
+                          detailHandler(item)
+                        }}
                       >
                         Detail
                       </CButton>

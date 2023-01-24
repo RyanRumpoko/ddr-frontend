@@ -1,22 +1,27 @@
 import React from 'react'
-
 import { CRow, CCol, CWidgetStatsA } from '@coreui/react'
+import { useQuery, gql } from '@apollo/client'
 
-import WidgetsDropdown from '../widgets/WidgetsDropdown'
+const GET_TOTAL_TODAY_CUSTOMER = gql`
+  query GetTotalInvoicesToday {
+    getTotalInvoicesToday
+  }
+`
 
 const Dashboard = () => {
+  const { data, loading } = useQuery(GET_TOTAL_TODAY_CUSTOMER)
   return (
     <>
-      <WidgetsDropdown />
       <CRow className="justify-content-center">
-        <CCol sm="6" lg="3">
-          <CWidgetStatsA
-          // style={{ height: '100px' }}
-          // color="gradient-info"
-          // text="Total Staff"
-          // header={dataUser.getAllUser.length.toString()}
-          // onClick={() => history.push('/staff/showallstaff/ACTIVE')}
-          />
+        <CCol sm="6" lg="4">
+          {!loading && (
+            <CWidgetStatsA
+              style={{ height: '100px' }}
+              color="info"
+              value={data.getTotalInvoicesToday}
+              title="Total Mobil Hari Ini"
+            />
+          )}
         </CCol>
       </CRow>
     </>
