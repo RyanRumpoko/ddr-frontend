@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react'
 import {
   CForm,
   CFormInput,
-  // CFormSelect,
   CModal,
   CModalBody,
   CModalHeader,
@@ -12,8 +11,7 @@ import {
   CButton,
 } from '@coreui/react'
 import { gql, useLazyQuery, useMutation } from '@apollo/client'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from 'react-toastify'
 
 const ADD_INVOICE = gql`
   mutation AddInvoice($input: InvoiceInput) {
@@ -113,11 +111,15 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
   }
   const onSubmit = async (e) => {
     e.preventDefault()
+    let total_invoice = 0
+    arrayInput.forEach((el) => {
+      total_invoice += el.total
+    })
 
     try {
       await addNewInvoice({
         variables: {
-          input: { ...values, service_bulk: arrayInput },
+          input: { ...values, service_bulk: arrayInput, total_invoice },
         },
       })
       setRefreshTrigger(true)
@@ -141,16 +143,6 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
               <CCol sm="3" className="pb-2">
-                {/* <CFormSelect
-                  name="service_name"
-                  value={el.service_name}
-                  onChange={(e) => onChange(idx, e)}
-                  options={[
-                    '- Pilih Service -',
-                    { label: 'Rack Steer', value: 'rack steer' },
-                    { label: 'Ball Joint', value: 'ball joint' },
-                  ]}
-                /> */}
                 {settingServiceList && settingServiceList.length !== 0 && (
                   <>
                     <CFormInput
@@ -227,7 +219,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
           </CRow>
         </CForm>
       </CModalBody>
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </CModal>
   )
 }

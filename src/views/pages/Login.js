@@ -68,12 +68,12 @@ const Login = () => {
   const onSubmit = async (e) => {
     e.preventDefault()
 
-    if (!values.username) {
-      errors.push(toast.error('Username cannot be empty'))
-    }
-    if (!values.password) {
-      errors.push(toast.error('Password cannot be empty'))
-    }
+    // if (!values.username) {
+    //   errors.push(toast.error('Username cannot be empty'))
+    // }
+    // if (!values.password) {
+    //   errors.push(toast.error('Password cannot be empty'))
+    // }
 
     if (errors.length > 0) {
       notify()
