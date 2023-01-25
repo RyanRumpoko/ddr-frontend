@@ -23,9 +23,21 @@ const GET_ALL_USERS = gql`
     getAllUsers {
       _id
       username
+      role
     }
   }
 `
+
+const getRole = (role) => {
+  switch (role) {
+    case 'superadmin':
+      return 'SuperAdmin'
+    case 'admin':
+      return 'Admin'
+    default:
+      return ''
+  }
+}
 
 const UsersList = () => {
   const navigate = useNavigate()
@@ -90,7 +102,7 @@ const UsersList = () => {
                   <CTableRow key={item._id}>
                     <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
                     <CTableDataCell>{item.username}</CTableDataCell>
-                    <CTableDataCell>{item.role ? item.role : '-'}</CTableDataCell>
+                    <CTableDataCell>{item.role ? getRole(item.role) : '-'}</CTableDataCell>
                     <CTableDataCell>
                       <CButton
                         color="primary"
