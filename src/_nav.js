@@ -53,6 +53,11 @@ const _nav = [
         name: 'Setting Service',
         to: '/setting/service',
       },
+      {
+        component: CNavItem,
+        name: 'Setting Brand',
+        to: '/setting/brand',
+      },
     ],
   },
 ]

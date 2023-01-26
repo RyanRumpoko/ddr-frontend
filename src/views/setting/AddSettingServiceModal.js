@@ -13,8 +13,7 @@ import {
   CButton,
 } from '@coreui/react'
 import { gql, useMutation } from '@apollo/client'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from 'react-toastify'
 
 const ADD_SETTING_SERVICE = gql`
   mutation AddSettingService($input: SettingServiceInput) {
@@ -91,7 +90,7 @@ const AddSettingServiceModal = ({
       backdrop="static"
     >
       <CModalHeader closeButton>
-        <CModalTitle>Tambah User Baru</CModalTitle>
+        <CModalTitle>Tambah Setting Service Baru</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CForm onSubmit={onSubmit}>
@@ -140,7 +139,6 @@ const AddSettingServiceModal = ({
           </CRow>
         </CForm>
       </CModalBody>
-      <ToastContainer />
     </CModal>
   )
 }
