@@ -5,19 +5,32 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const DELETE_SERVICE = gql`
-  mutation DeleteService($id: ID) {
-    deleteService(id: $id)
+  mutation DeleteService($id: ID, $is_disc: Boolean) {
+    deleteService(id: $id, is_disc: $is_disc)
   }
 `
 
-const DeleteServiceModal = ({ _id, deleteModal, setDeleteModal, setRefreshTrigger }) => {
+const DeleteServiceModal = ({
+  _id,
+  deleteModal,
+  setDeleteModal,
+  setRefreshTrigger,
+  isDisc,
+  setIsDisc,
+}) => {
   const [deleteService] = useMutation(DELETE_SERVICE)
+
+  const onCloseHandler = () => {
+    setIsDisc(false)
+    setDeleteModal(false)
+  }
   const onSubmit = async (e) => {
     e.preventDefault()
     try {
       await deleteService({
         variables: {
           id: _id,
+          is_disc: isDisc,
         },
       })
       setRefreshTrigger(true)
@@ -27,7 +40,7 @@ const DeleteServiceModal = ({ _id, deleteModal, setDeleteModal, setRefreshTrigge
     }
   }
   return (
-    <CModal visible={deleteModal} onClose={() => setDeleteModal(false)} backdrop="static">
+    <CModal visible={deleteModal} onClose={onCloseHandler} backdrop="static">
       <CModalHeader closeButton>Delete Service</CModalHeader>
       <CModalBody>Anda yakin ingin menghapus service ini ?</CModalBody>
       <CModalFooter>

@@ -4,7 +4,7 @@ import {
   CCard,
   CCardBody,
   CCardHeader,
-  // CCardFooter,
+  CCardFooter,
   CCol,
   CRow,
   CTable,
@@ -13,8 +13,8 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  // CPagination,
-  // CPaginationItem,
+  CPagination,
+  CPaginationItem,
 } from '@coreui/react'
 import { useQuery, useLazyQuery, gql } from '@apollo/client'
 import AddSettingServiceModal from './AddSettingServiceModal'
@@ -31,7 +31,7 @@ const GET_ALL_SETTING_SERVICE_PAGINATION = gql`
   }
 `
 
-const GET_TOTAL_SETTING_sERVICE = gql`
+const GET_TOTAL_SETTING_SERVICE = gql`
   query GetTotalSettingService {
     getTotalAllSettingService
   }
@@ -39,8 +39,8 @@ const GET_TOTAL_SETTING_sERVICE = gql`
 
 const SettingService = () => {
   const [settingServiceList, setSettingServiceList] = useState([])
-  // const [currentPage, setActivePage] = useState(1)
-  // const [totalPage, setTotalPage] = useState(0)
+  const [currentPage, setActivePage] = useState(1)
+  const [totalPage, setTotalPage] = useState()
   const [settingServiceModal, setSettingServiceModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
 
@@ -53,10 +53,15 @@ const SettingService = () => {
     },
     fetchPolicy: 'cache-and-network',
   })
-  useQuery(GET_TOTAL_SETTING_sERVICE, {
+  useQuery(GET_TOTAL_SETTING_SERVICE, {
     onCompleted: (data) => {
-      // const count = Math.ceil(data.getTotalAllSettingService / 25)
-      // setTotalPage(count)
+      console.log(data.getTotalAllSettingService)
+      const count = Math.ceil(data.getTotalAllSettingService / 25)
+      const countArray = []
+      for (let i = 0; i < count; i++) {
+        countArray.push(i)
+      }
+      setTotalPage(countArray)
     },
   })
 
@@ -64,13 +69,13 @@ const SettingService = () => {
     getAllSetting({
       variables: {
         input: {
-          page: 1,
-          perPage: 100,
+          page: currentPage,
+          perPage: 25,
         },
       },
     })
     // eslint-disable-next-line
-  }, [])
+  }, [currentPage])
 
   const capitalizeString = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
@@ -81,13 +86,20 @@ const SettingService = () => {
   const addNewSettingService = () => {
     setSettingServiceModal(!settingServiceModal)
   }
+  const laquoHandler = (direction) => {
+    if (direction === 'left' && currentPage > 1) {
+      setActivePage(currentPage - 1)
+    } else if (direction === 'right' && currentPage < totalPage.length) {
+      setActivePage(currentPage + 1)
+    }
+  }
 
   if (refreshTrigger) {
     getAllSetting({
       variables: {
         input: {
-          page: 1,
-          perPage: 100,
+          page: currentPage,
+          perPage: 25,
         },
       },
     })
@@ -130,7 +142,9 @@ const SettingService = () => {
               settingServiceList.length !== 0 &&
               settingServiceList.map((item, idx) => (
                 <CTableRow key={item._id}>
-                  <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                  <CTableHeaderCell scope="row">
+                    {currentPage === 1 ? idx + 1 : (currentPage - 1) * 25 + idx + 1}
+                  </CTableHeaderCell>
                   <CTableDataCell>{capitalizeString(item.service_name)}</CTableDataCell>
                   <CTableDataCell>{localString(item.base_price)}</CTableDataCell>
                   <CTableDataCell>{item.is_active ? 'Yes' : 'No'}</CTableDataCell>
@@ -142,24 +156,37 @@ const SettingService = () => {
           <div className="text-center text-danger">Belum ada data</div>
         )}
       </CCardBody>
-      {/* <CCardFooter className="d-flex justify-content-center align-item-center">
+      <CCardFooter className="d-flex justify-content-center align-item-center">
         {totalPage && (
-          <CPagination
-          >
-            <CPaginationItem>Previous</CPaginationItem>
-            {totalPage &&
-              totalPage.map((_, idx) => (
-                <CPaginationItem key={idx}>{idx + 1}</CPaginationItem>
-              ))}
-            <CPaginationItem>Next</CPaginationItem>
+          <CPagination>
+            <CPaginationItem onClick={() => laquoHandler('left')} disabled={currentPage === 1}>
+              Previous
+            </CPaginationItem>
+            {totalPage.map((_, idx) => (
+              <CPaginationItem
+                key={idx}
+                onClick={() => setActivePage(idx + 1)}
+                active={currentPage === idx + 1}
+              >
+                {idx + 1}
+              </CPaginationItem>
+            ))}
+            <CPaginationItem
+              onClick={() => laquoHandler('right')}
+              disabled={currentPage === totalPage.length}
+            >
+              Next
+            </CPaginationItem>
           </CPagination>
         )}
-      </CCardFooter> */}
-      <AddSettingServiceModal
-        settingServiceModal={settingServiceModal}
-        setSettingServiceModal={setSettingServiceModal}
-        setRefreshTrigger={setRefreshTrigger}
-      />
+      </CCardFooter>
+      {settingServiceModal && (
+        <AddSettingServiceModal
+          settingServiceModal={settingServiceModal}
+          setSettingServiceModal={setSettingServiceModal}
+          setRefreshTrigger={setRefreshTrigger}
+        />
+      )}
       <ToastContainer />
     </CCard>
   )

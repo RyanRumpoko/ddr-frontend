@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CForm,
   CFormInput,
@@ -10,7 +10,7 @@ import {
   CCol,
   CButton,
 } from '@coreui/react'
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useLazyQuery } from '@apollo/client'
 import { toast } from 'react-toastify'
 
 const ADD_SERVICE = gql`
@@ -36,6 +36,8 @@ const AddServiceModal = ({
   addServiceModal,
   setAddServiceModal,
   setRefreshTrigger,
+  isDisc,
+  setIsDisc,
 }) => {
   const [values, setValues] = useState({
     service_name: '',
@@ -46,7 +48,7 @@ const AddServiceModal = ({
   const [settingServiceList, setSettingServiceList] = useState([])
 
   const [addService] = useMutation(ADD_SERVICE)
-  const { loading: loadingSetting } = useQuery(GET_ALL_SETTING_SERVICE, {
+  const [getSettingService, { loading: loadingSetting }] = useLazyQuery(GET_ALL_SETTING_SERVICE, {
     onCompleted: (data) => {
       setSettingServiceList(data.getAllSettingService)
     },
@@ -55,6 +57,15 @@ const AddServiceModal = ({
     },
     fetchPolicy: 'cache-and-network',
   })
+
+  useEffect(() => {
+    if (isDisc) {
+      setValues({ ...values, service_name: 'Discount', quantity: 1 })
+    } else {
+      getSettingService()
+    }
+    // eslint-disable-next-line
+  }, [])
 
   const errors = []
   const notify = () => {
@@ -79,6 +90,10 @@ const AddServiceModal = ({
 
   const capitalizeString = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+  const onCloseHandler = () => {
+    setIsDisc(false)
+    setAddServiceModal(false)
   }
   const onChange = (e) => {
     if (e.target.name === 'service_name') {
@@ -107,7 +122,7 @@ const AddServiceModal = ({
       try {
         await addService({
           variables: {
-            input: { ...values, invoice_id },
+            input: { ...values, invoice_id, is_disc: isDisc },
           },
         })
         setRefreshTrigger(true)
@@ -118,12 +133,7 @@ const AddServiceModal = ({
     }
   }
   return (
-    <CModal
-      size="lg"
-      visible={addServiceModal}
-      onClose={() => setAddServiceModal(false)}
-      backdrop="static"
-    >
+    <CModal size="lg" visible={addServiceModal} onClose={onCloseHandler} backdrop="static">
       <CModalHeader closeButton>
         <CModalTitle>Tambah Service</CModalTitle>
       </CModalHeader>
@@ -150,6 +160,17 @@ const AddServiceModal = ({
                   </datalist>
                 </>
               )}
+              {isDisc && (
+                <CFormInput
+                  type="text"
+                  placeholder="Nama Barang"
+                  name="service_name"
+                  value={values.service_name}
+                  onChange={onChange}
+                  disabled={isDisc}
+                  required
+                />
+              )}
             </CCol>
             <CCol sm="2" className="pb-2">
               <CFormInput
@@ -158,6 +179,7 @@ const AddServiceModal = ({
                 name="quantity"
                 value={values.quantity}
                 onChange={onChange}
+                disabled={isDisc}
                 required
               />
             </CCol>

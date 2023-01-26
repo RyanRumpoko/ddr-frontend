@@ -11,6 +11,7 @@ const Invoices = React.lazy(() => import('./views/customers/Invoices'))
 const InvoiceDetail = React.lazy(() => import('./views/customers/InvoiceDetail'))
 // Setting
 const SettingService = React.lazy(() => import('./views/setting/SettingService'))
+const SettingBrand = React.lazy(() => import('./views/setting/SettingBrand'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -22,6 +23,7 @@ const routes = [
   { path: '/customers/list/invoices', name: 'Invoices', element: Invoices },
   { path: '/customers/list/invoices/detail', name: 'Invoices Detail', element: InvoiceDetail },
   { path: '/setting/service', name: 'Setting Service', element: SettingService },
+  { path: '/setting/brand', name: 'Setting Brand', element: SettingBrand },
 ]
 
 export default routes

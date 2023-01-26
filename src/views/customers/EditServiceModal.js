@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   CForm,
   CFormInput,
@@ -10,7 +10,7 @@ import {
   CCol,
   CButton,
 } from '@coreui/react'
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery, useLazyQuery } from '@apollo/client'
 import { toast } from 'react-toastify'
 
 const GET_SERVICE_BY_ID = gql`
@@ -42,7 +42,14 @@ const UPDATE_SERVICE = gql`
   }
 `
 
-const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefreshTrigger }) => {
+const EditServiceModal = ({
+  _id,
+  editServiceModal,
+  setEditServiceModal,
+  setRefreshTrigger,
+  isDisc,
+  setIsDisc,
+}) => {
   const [values, setValues] = useState({
     service_name: '',
     quantity: 0,
@@ -61,7 +68,7 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
     variables: { id: _id },
     fetchPolicy: 'cache-and-network',
   })
-  const { loading: loadingSetting } = useQuery(GET_ALL_SETTING_SERVICE, {
+  const [getSettingService, { loading: loadingSetting }] = useLazyQuery(GET_ALL_SETTING_SERVICE, {
     onCompleted: (data) => {
       setSettingServiceList(data.getAllSettingService)
     },
@@ -71,6 +78,13 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
     fetchPolicy: 'cache-and-network',
   })
   const [updateService] = useMutation(UPDATE_SERVICE)
+
+  useEffect(() => {
+    if (!isDisc) {
+      getSettingService()
+    }
+    // eslint-disable-next-line
+  }, [])
 
   const errors = []
   const notify = () => {
@@ -95,6 +109,10 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
 
   const capitalizeString = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
+  }
+  const onCloseHandler = () => {
+    setIsDisc(false)
+    setEditServiceModal(false)
   }
   const onChange = (e) => {
     if (e.target.name === 'service_name') {
@@ -129,6 +147,7 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
               quantity: values.quantity,
               price: values.price,
               total: values.total,
+              is_disc: isDisc,
             },
           },
         })
@@ -140,12 +159,7 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
     }
   }
   return (
-    <CModal
-      size="lg"
-      visible={editServiceModal}
-      onClose={() => setEditServiceModal(false)}
-      backdrop="static"
-    >
+    <CModal size="lg" visible={editServiceModal} onClose={onCloseHandler} backdrop="static">
       <CModalHeader closeButton>
         <CModalTitle>Update Service</CModalTitle>
       </CModalHeader>
@@ -173,6 +187,17 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
                     </datalist>
                   </>
                 )}
+                {isDisc && (
+                  <CFormInput
+                    type="text"
+                    placeholder="Nama Barang"
+                    name="service_name"
+                    value={values.service_name}
+                    onChange={onChange}
+                    disabled={isDisc}
+                    required
+                  />
+                )}
               </CCol>
               <CCol sm="2" className="pb-2">
                 <CFormInput
@@ -181,6 +206,7 @@ const EditServiceModal = ({ _id, editServiceModal, setEditServiceModal, setRefre
                   name="quantity"
                   value={values.quantity}
                   onChange={onChange}
+                  disabled={isDisc}
                   required
                 />
               </CCol>
