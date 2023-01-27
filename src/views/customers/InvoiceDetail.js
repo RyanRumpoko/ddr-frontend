@@ -22,7 +22,7 @@ import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
 import AddServiceModal from './AddServiceModal'
 
-const routing = process.env.REACT_APP_REST_ENDPOINT_LOCAL
+const routing = process.env.REACT_APP_REST_ENDPOINT_CYCLIC
 
 const GET_SERVICES_BY_INVOICE_ID = gql`
   query GetServicesByInvoiceId($id: ID) {
@@ -38,6 +38,7 @@ const GET_SERVICES_BY_INVOICE_ID = gql`
 
 const InvoiceDetail = () => {
   const { state } = useLocation()
+  console.log(state)
   const [serviceList, setServiceList] = useState([])
   const [invoiceTotal, setInvoiceTotal] = useState(0)
   const [editMode, setEditMode] = useState(true)
@@ -192,7 +193,12 @@ const InvoiceDetail = () => {
         </CRow>
         <CRow>
           <CCol lg="6">
-            <CButton size="sm" color="info text-white" onClick={downloadHandler}>
+            <CButton
+              size="sm"
+              color="info text-white"
+              onClick={downloadHandler}
+              disabled={state.status !== 'done'}
+            >
               Download Invoice
             </CButton>
           </CCol>
