@@ -81,6 +81,9 @@ const Invoices = () => {
   const invoiceDetailHandler = (data) => {
     navigate('/customers/list/invoices/detail', { state: data })
   }
+  const changeStatusHandler = (item) => {
+    console.log(item)
+  }
   const localString = (number) => {
     return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
   }
@@ -134,18 +137,19 @@ const Invoices = () => {
                       variant="outline"
                       shape="square"
                       size="sm"
-                      // onClick={() => {
-                      //   invoiceListHandler(item)
-                      // }}
+                      className="me-1 mb-1"
+                      onClick={() => {
+                        changeStatusHandler(item)
+                      }}
                     >
-                      Edit
+                      Ganti Status
                     </CButton>
                     <CButton
                       color="primary"
                       variant="outline"
                       shape="square"
                       size="sm"
-                      className="mx-1"
+                      className="mb-1"
                       onClick={() => {
                         invoiceDetailHandler(item)
                       }}

@@ -10,7 +10,7 @@ import {
   CFormInput,
   CFormSelect,
 } from '@coreui/react'
-import { gql, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -18,6 +18,15 @@ const ADD_CUSTOMER = gql`
   mutation AddCustomer($input: CustomerInput) {
     addCustomer(input: $input) {
       _id
+    }
+  }
+`
+
+const GET_ALL_SETTING_BRAND = gql`
+  query GetAllSettingBrand {
+    getAllSettingBrand {
+      _id
+      brand_name
     }
   }
 `
@@ -33,8 +42,18 @@ const AddCustomer = () => {
     color: '',
     plate_number: '',
   })
+  const [settingBrandList, setSettingBrandList] = useState()
 
   const [addNewCustomer] = useMutation(ADD_CUSTOMER)
+  const { loading: loadingSetting } = useQuery(GET_ALL_SETTING_BRAND, {
+    onCompleted: (data) => {
+      setSettingBrandList(data.getAllSettingBrand)
+    },
+    onError(err) {
+      console.log(err)
+    },
+    fetchPolicy: 'cache-and-network',
+  })
 
   const errors = []
   const notify = () => {
@@ -67,6 +86,9 @@ const AddCustomer = () => {
     if (!values.plate_number) {
       errors.push(toast.error('Nomor polisi tidak boloh kosong'))
     }
+  }
+  const capitalizeString = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1)
   }
   const onChange = (e) => {
     setValues({ ...values, [e.target.name]: e.target.value })
@@ -149,12 +171,24 @@ const AddCustomer = () => {
             </CCol>
             <CCol lg="2">Merk</CCol>
             <CCol lg="4">
-              <CFormInput
-                type="text"
-                name="brand"
-                value={values.brand}
-                onChange={(e) => onChange(e)}
-              />
+              {!loadingSetting && settingBrandList && (
+                <>
+                  <CFormInput
+                    list="dataService"
+                    type="text"
+                    name="brand"
+                    value={values.brand}
+                    onChange={(e) => onChange(e)}
+                  />
+                  <datalist id="dataService">
+                    {settingBrandList.map((item) => (
+                      <option key={item._id} value={item._brand_name}>
+                        {capitalizeString(item.brand_name)}
+                      </option>
+                    ))}
+                  </datalist>
+                </>
+              )}
             </CCol>
           </CRow>
           <CRow className="my-3">
