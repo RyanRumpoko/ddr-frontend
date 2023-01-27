@@ -16,6 +16,7 @@ import {
 import { useLazyQuery, gql } from '@apollo/client'
 import { useNavigate, useLocation } from 'react-router-dom'
 import AddInvoiceModal from './AddInvoiceModal'
+import InvoiceStatusModal from './InvoiceStatusModal'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
@@ -49,7 +50,13 @@ const Invoices = () => {
   const { state } = useLocation()
   const [invoiceList, setInvoiceList] = useState([])
   const [invoiceModal, setInvoiceModal] = useState(false)
+  const [updateStatusModal, setUpdateStatusModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
+  const [itemUpdateStatus, setItemUpdateStatus] = useState({
+    _id: '',
+    status: '',
+  })
+  const [isUpdateStatus, setIsUpdateStatus] = useState(false)
 
   let navigate = useNavigate()
 
@@ -82,7 +89,8 @@ const Invoices = () => {
     navigate('/customers/list/invoices/detail', { state: data })
   }
   const changeStatusHandler = (item) => {
-    console.log(item)
+    setItemUpdateStatus({ _id: item._id, status: item.status })
+    setUpdateStatusModal(!updateStatusModal)
   }
   const localString = (number) => {
     return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
@@ -90,7 +98,12 @@ const Invoices = () => {
   if (refreshTrigger) {
     refetch()
     setRefreshTrigger(false)
-    toast.success('Invoice berhasil dibuat')
+    if (isUpdateStatus) {
+      toast.success('Status berhasil diubah')
+    } else {
+      toast.success('Invoice berhasil dibuat')
+    }
+    setIsUpdateStatus(false)
   }
 
   return (
@@ -171,6 +184,15 @@ const Invoices = () => {
           setInvoiceModal={setInvoiceModal}
           id={state._id}
           setRefreshTrigger={setRefreshTrigger}
+        />
+      )}
+      {updateStatusModal && (
+        <InvoiceStatusModal
+          item={itemUpdateStatus}
+          updateStatusModal={updateStatusModal}
+          setUpdateStatusModal={setUpdateStatusModal}
+          setRefreshTrigger={setRefreshTrigger}
+          setIsUpdateStatus={setIsUpdateStatus}
         />
       )}
       <ToastContainer />
