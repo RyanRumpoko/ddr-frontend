@@ -41,6 +41,7 @@ const SettingService = () => {
   const [settingServiceList, setSettingServiceList] = useState([])
   const [currentPage, setActivePage] = useState(1)
   const [totalPage, setTotalPage] = useState()
+  const [perPage] = useState(25)
   const [settingServiceModal, setSettingServiceModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
 
@@ -55,11 +56,14 @@ const SettingService = () => {
   })
   useQuery(GET_TOTAL_SETTING_SERVICE, {
     onCompleted: (data) => {
-      console.log(data.getTotalAllSettingService)
-      const count = Math.ceil(data.getTotalAllSettingService / 25)
+      const count = Math.ceil(data.getTotalAllSettingService / perPage)
       const countArray = []
-      for (let i = 0; i < count; i++) {
-        countArray.push(i)
+      for (let i = 1; i <= count; i++) {
+        if (i <= 3) {
+          countArray.push({ i, hidden: false })
+        } else {
+          countArray.push({ i, hidden: true })
+        }
       }
       setTotalPage(countArray)
     },
@@ -70,7 +74,7 @@ const SettingService = () => {
       variables: {
         input: {
           page: currentPage,
-          perPage: 25,
+          perPage: perPage,
         },
       },
     })
@@ -89,7 +93,19 @@ const SettingService = () => {
   const laquoHandler = (direction) => {
     if (direction === 'left' && currentPage > 1) {
       setActivePage(currentPage - 1)
+      const newPage = [...totalPage]
+      if (currentPage + 2 <= totalPage.length) {
+        newPage[currentPage + 1].hidden = true
+        newPage[currentPage - 2].hidden = false
+      }
+      setTotalPage(newPage)
     } else if (direction === 'right' && currentPage < totalPage.length) {
+      const newPage = [...totalPage]
+      if (totalPage.length - currentPage > 0 && currentPage > 2) {
+        newPage[currentPage - 3].hidden = true
+        newPage[currentPage].hidden = false
+      }
+      setTotalPage(newPage)
       setActivePage(currentPage + 1)
     }
   }
@@ -99,7 +115,7 @@ const SettingService = () => {
       variables: {
         input: {
           page: currentPage,
-          perPage: 25,
+          perPage: perPage,
         },
       },
     })
@@ -143,7 +159,7 @@ const SettingService = () => {
               settingServiceList.map((item, idx) => (
                 <CTableRow key={item._id}>
                   <CTableHeaderCell scope="row">
-                    {currentPage === 1 ? idx + 1 : (currentPage - 1) * 25 + idx + 1}
+                    {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
                   </CTableHeaderCell>
                   <CTableDataCell>{capitalizeString(item.service_name)}</CTableDataCell>
                   <CTableDataCell>{localString(item.base_price)}</CTableDataCell>
@@ -162,11 +178,12 @@ const SettingService = () => {
             <CPaginationItem onClick={() => laquoHandler('left')} disabled={currentPage === 1}>
               Previous
             </CPaginationItem>
-            {totalPage.map((_, idx) => (
+            {totalPage.map((item, idx) => (
               <CPaginationItem
                 key={idx}
                 onClick={() => setActivePage(idx + 1)}
                 active={currentPage === idx + 1}
+                hidden={item.hidden}
               >
                 {idx + 1}
               </CPaginationItem>
