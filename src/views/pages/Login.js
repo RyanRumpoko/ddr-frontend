@@ -68,12 +68,12 @@ const Login = () => {
   const onSubmit = async (e) => {
     e.preventDefault()
 
-    // if (!values.username) {
-    //   errors.push(toast.error('Username cannot be empty'))
-    // }
-    // if (!values.password) {
-    //   errors.push(toast.error('Password cannot be empty'))
-    // }
+    if (!values.username) {
+      errors.push(toast.error('Username cannot be empty'))
+    }
+    if (!values.password) {
+      errors.push(toast.error('Password cannot be empty'))
+    }
 
     if (errors.length > 0) {
       notify()
@@ -85,7 +85,7 @@ const Login = () => {
     <div className="bg-light min-vh-100 d-flex flex-row align-items-center">
       <CContainer>
         <CRow className="justify-content-center">
-          <CCol md="5">
+          <CCol lg="5" sm="12">
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
@@ -102,6 +102,7 @@ const Login = () => {
                         name="username"
                         value={values.username}
                         onChange={onChange}
+                        required
                       />
                     </CInputGroup>
                     <CInputGroup className="mb-4">
@@ -114,10 +115,11 @@ const Login = () => {
                         name="password"
                         value={values.password}
                         onChange={onChange}
+                        required
                       />
                     </CInputGroup>
                     <CRow>
-                      <CCol md="12">
+                      <CCol sm="12">
                         <CButton type="submit" color="primary" className="px-4 col-12">
                           Login
                         </CButton>
@@ -125,7 +127,7 @@ const Login = () => {
                     </CRow>
                   </CForm>
                   <CRow>
-                    <CCol md="12" className="mt-2">
+                    <CCol sm="12" className="mt-2">
                       <span className="float-end">Ver. {process.env.REACT_APP_VERSION}</span>
                     </CCol>
                   </CRow>

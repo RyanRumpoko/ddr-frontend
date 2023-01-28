@@ -14,7 +14,7 @@ const Dashboard = () => {
     <>
       <CRow className="justify-content-center">
         <CCol sm="6" lg="4">
-          {!loading && (
+          {!loading && data && (
             <CWidgetStatsA
               style={{ height: '100px' }}
               color="info"

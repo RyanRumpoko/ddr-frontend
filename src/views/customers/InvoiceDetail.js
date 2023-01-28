@@ -38,7 +38,6 @@ const GET_SERVICES_BY_INVOICE_ID = gql`
 
 const InvoiceDetail = () => {
   const { state } = useLocation()
-  console.log(state)
   const [serviceList, setServiceList] = useState([])
   const [invoiceTotal, setInvoiceTotal] = useState(0)
   const [editMode, setEditMode] = useState(true)
