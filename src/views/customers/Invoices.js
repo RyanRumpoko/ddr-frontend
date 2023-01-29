@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import {
   CButton,
   CCard,
@@ -17,8 +17,10 @@ import { useLazyQuery, gql } from '@apollo/client'
 import { useNavigate, useLocation } from 'react-router-dom'
 import AddInvoiceModal from './AddInvoiceModal'
 import InvoiceStatusModal from './InvoiceStatusModal'
+import AddInvoiceBeforeModal from './AddInvoiceBeforeModal'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { AuthContext } from 'src/context/auth'
 
 const GET_INVOICES_BY_CUSTOMER_ID = gql`
   query GetInvoiceByCustomerId($id: ID) {
@@ -48,9 +50,12 @@ const getStatus = (status) => {
 
 const Invoices = () => {
   const { state } = useLocation()
+  const { user } = useContext(AuthContext)
+
   const [invoiceList, setInvoiceList] = useState([])
   const [invoiceModal, setInvoiceModal] = useState(false)
   const [updateStatusModal, setUpdateStatusModal] = useState(false)
+  const [invoiceBeforeModal, setInvoiceBeforeModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
   const [itemUpdateStatus, setItemUpdateStatus] = useState({
     _id: '',
@@ -85,6 +90,9 @@ const Invoices = () => {
   const addNewInvoiceModal = () => {
     setInvoiceModal(!invoiceModal)
   }
+  const addInvoiceBeforeModal = () => {
+    setInvoiceBeforeModal(!invoiceBeforeModal)
+  }
   const invoiceDetailHandler = (data) => {
     navigate('/customers/list/invoices/detail', { state: data })
   }
@@ -118,6 +126,17 @@ const Invoices = () => {
               Tambah Invoice
             </CButton>
           </CCol>
+          {user?.role === 'superadmin' && (
+            <CCol lg="6">
+              <CButton
+                onClick={addInvoiceBeforeModal}
+                color="success"
+                className="mb-4 col-12 text-white"
+              >
+                Tambah Data Terdahulu
+              </CButton>
+            </CCol>
+          )}
         </CRow>
         <CRow>
           <CCol lg="12">
@@ -193,6 +212,14 @@ const Invoices = () => {
           setUpdateStatusModal={setUpdateStatusModal}
           setRefreshTrigger={setRefreshTrigger}
           setIsUpdateStatus={setIsUpdateStatus}
+        />
+      )}
+      {invoiceBeforeModal && (
+        <AddInvoiceBeforeModal
+          invoiceBeforeModal={invoiceBeforeModal}
+          setInvoiceBeforeModal={setInvoiceBeforeModal}
+          id={state._id}
+          setRefreshTrigger={setRefreshTrigger}
         />
       )}
       <ToastContainer />

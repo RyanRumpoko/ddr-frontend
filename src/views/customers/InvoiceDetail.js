@@ -22,7 +22,7 @@ import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
 import AddServiceModal from './AddServiceModal'
 
-const routing = process.env.REACT_APP_REST_ENDPOINT_CYCLIC
+const routing = process.env.REACT_APP_REST_ENDPOINT_LOCAL
 
 const GET_SERVICES_BY_INVOICE_ID = gql`
   query GetServicesByInvoiceId($id: ID) {

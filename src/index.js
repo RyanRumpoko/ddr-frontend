@@ -10,7 +10,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider, createHttpLink } from '@ap
 import { setContext } from '@apollo/client/link/context'
 
 const httpLink = createHttpLink({
-  uri: process.env.REACT_APP_REST_ENDPOINT_GRAPHQL_CYCLIC,
+  uri: process.env.REACT_APP_REST_ENDPOINT_GRAPHQL_LOCAL,
 })
 
 const authLink = setContext((_, { headers }) => {
