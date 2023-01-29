@@ -83,7 +83,7 @@ const CustomersList = () => {
   const [settingBrandList, setSettingBrandList] = useState([])
   const [currentPage, setActivePage] = useState(1)
   const [totalPage, setTotalPage] = useState()
-  const [perPage] = useState(2)
+  const [perPage] = useState(25)
   const [isSearching, setIsSearching] = useState(false)
 
   let navigate = useNavigate()
