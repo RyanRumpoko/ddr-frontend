@@ -61,9 +61,8 @@ const AddServiceModal = ({
   useEffect(() => {
     if (isDisc) {
       setValues({ ...values, service_name: 'Discount', quantity: 1 })
-    } else {
-      getSettingService()
     }
+    getSettingService()
     // eslint-disable-next-line
   }, [])
 
@@ -116,13 +115,21 @@ const AddServiceModal = ({
     e.preventDefault()
     validate()
 
+    const getServiceId = settingServiceList.find(
+      (item) => item.service_name === values.service_name.toLocaleLowerCase(),
+    )
+    if (!getServiceId)
+      errors.push(
+        toast.error(`Nama setting "${values.service_name.toLocaleLowerCase()}" belum terdaftar`),
+      )
+
     if (errors.length > 0) {
       notify()
     } else {
       try {
         await addService({
           variables: {
-            input: { ...values, invoice_id, is_disc: isDisc },
+            input: { ...values, service_name: getServiceId._id, invoice_id, is_disc: isDisc },
           },
         })
         setRefreshTrigger(true)
@@ -141,7 +148,7 @@ const AddServiceModal = ({
         <CForm onSubmit={onSubmit}>
           <CRow className="mb-3 justify-content-center">
             <CCol sm="3" className="pb-2">
-              {!loadingSetting && settingServiceList && settingServiceList.length !== 0 && (
+              {!loadingSetting && settingServiceList && settingServiceList.length !== 0 && !isDisc && (
                 <>
                   <CFormInput
                     list="dataService"

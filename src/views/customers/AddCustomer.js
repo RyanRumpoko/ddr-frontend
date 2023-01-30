@@ -130,13 +130,13 @@ const AddCustomer = () => {
       <CCardBody>
         <CForm onSubmit={onSubmit}>
           <CRow>
-            <CCol lg="4" className="border-bottom mt-3">
+            <CCol sm="4" className="border-bottom mt-3">
               <h5>Data Customer</h5>
             </CCol>
           </CRow>
           <CRow className="my-3">
-            <CCol lg="2">Nama</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Nama</CCol>
+            <CCol sm="4">
               <CFormInput
                 type="text"
                 name="name"
@@ -144,8 +144,8 @@ const AddCustomer = () => {
                 onChange={(e) => onChange(e)}
               />
             </CCol>
-            <CCol lg="2">Nomor Telepon</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Nomor Telepon</CCol>
+            <CCol sm="4">
               <CFormInput
                 type="text"
                 name="phone_number"
@@ -155,13 +155,13 @@ const AddCustomer = () => {
             </CCol>
           </CRow>
           <CRow>
-            <CCol lg="4" className="border-bottom mt-3">
+            <CCol sm="4" className="border-bottom mt-3">
               <h5>Data Kendaraan</h5>
             </CCol>
           </CRow>
           <CRow className="my-3">
-            <CCol lg="2">Nomor Polisi</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Nomor Polisi</CCol>
+            <CCol sm="4">
               <CFormInput
                 type="text"
                 name="plate_number"
@@ -169,8 +169,8 @@ const AddCustomer = () => {
                 onChange={(e) => onChange(e)}
               />
             </CCol>
-            <CCol lg="2">Merk</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Merk</CCol>
+            <CCol sm="4">
               {!loadingSetting && settingBrandList && (
                 <>
                   <CFormInput
@@ -192,8 +192,8 @@ const AddCustomer = () => {
             </CCol>
           </CRow>
           <CRow className="my-3">
-            <CCol lg="2">Tipe</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Tipe</CCol>
+            <CCol sm="4">
               <CFormInput
                 type="text"
                 name="type"
@@ -201,8 +201,8 @@ const AddCustomer = () => {
                 onChange={(e) => onChange(e)}
               />
             </CCol>
-            <CCol lg="2">Tahun</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Tahun</CCol>
+            <CCol sm="4">
               <CFormInput
                 type="text"
                 name="year"
@@ -212,8 +212,8 @@ const AddCustomer = () => {
             </CCol>
           </CRow>
           <CRow className="my-3">
-            <CCol lg="2">Warna</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Warna</CCol>
+            <CCol sm="4">
               <CFormInput
                 type="text"
                 name="color"
@@ -221,8 +221,8 @@ const AddCustomer = () => {
                 onChange={(e) => onChange(e)}
               />
             </CCol>
-            <CCol lg="2">Transmisi</CCol>
-            <CCol lg="4">
+            <CCol sm="2">Transmisi</CCol>
+            <CCol sm="4">
               <CFormSelect
                 name="transmission"
                 value={values.transmission}
@@ -236,7 +236,7 @@ const AddCustomer = () => {
             </CCol>
           </CRow>
           <CRow className="justify-content-between">
-            <CCol lg="12">
+            <CCol sm="12">
               <div className="mt-3 text-center">
                 <CButton type="submit" color="success" className="text-white col-6">
                   <i className="fas fa-save"></i> Simpan

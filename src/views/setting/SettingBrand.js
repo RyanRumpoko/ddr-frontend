@@ -43,6 +43,7 @@ const SettingBrand = () => {
   const [currentPage, setActivePage] = useState(1)
   const [totalPage, setTotalPage] = useState()
   const [perPage] = useState(25)
+  const [totalData, setTotalData] = useState(0)
 
   const [getAllSetting, { loading }] = useLazyQuery(GET_ALL_SETTING_BRAND_PAGINATION, {
     onCompleted: (data) => {
@@ -64,6 +65,7 @@ const SettingBrand = () => {
           countArray.push({ i, hidden: true })
         }
       }
+      setTotalData(data.getTotalAllSettingBrand)
       setTotalPage(countArray)
     },
   })
@@ -134,9 +136,7 @@ const SettingBrand = () => {
         </CRow>
         <CRow>
           <CCol lg="12">
-            {settingBrandList && (
-              <div className="mt-2 float-end">Total data: {settingBrandList.length}</div>
-            )}
+            {settingBrandList && <div className="mt-2 float-end">Total data: {totalData}</div>}
           </CCol>
         </CRow>
         <CTable>

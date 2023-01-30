@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
   CForm,
+  CFormLabel,
   CFormInput,
   CModal,
   CModalBody,
@@ -10,17 +11,12 @@ import {
   CCol,
   CButton,
 } from '@coreui/react'
-import { gql, useLazyQuery, useMutation } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import { toast } from 'react-toastify'
 
-const ADD_INVOICE = gql`
-  mutation AddInvoice($input: InvoiceInput) {
-    addInvoice(input: $input)
-  }
-`
-const GET_INVOICE_BY_MONTH = gql`
-  query GetInvoiceByMonth($input: GetAllInvoiceByMonth) {
-    getAllInvoicesByMonth(input: $input)
+const ADD_INVOICE_BEFORE = gql`
+  mutation AddInvoiceBefore($input: InvoiceBeforeInput) {
+    addInvoiceBefore(input: $input)
   }
 `
 const GET_ALL_SETTING_SERVICE = gql`
@@ -33,12 +29,18 @@ const GET_ALL_SETTING_SERVICE = gql`
   }
 `
 
-const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger }) => {
-  const date = new Date()
+const AddInvoiceBeforeModal = ({
+  invoiceBeforeModal,
+  setInvoiceBeforeModal,
+  id,
+  setRefreshTrigger,
+}) => {
   const [values, setValues] = useState({
     invoice_number: '',
     service_bulk: [],
     customer_id: id,
+    estimated_date: new Date().toISOString().slice(0, 10),
+    ongoing_date: new Date().toISOString().slice(0, 10),
   })
   const [arrayInput, setArrayInput] = useState([
     {
@@ -49,23 +51,9 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     },
   ])
   const [settingServiceList, setSettingServiceList] = useState([])
-  const romanNumeral = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
 
-  const [addNewInvoice] = useMutation(ADD_INVOICE)
-  const [getInvoiceByMonth] = useLazyQuery(GET_INVOICE_BY_MONTH, {
-    onCompleted: (data) => {
-      const invoice_number = data.getAllInvoicesByMonth + 1
-      const month = date.getMonth()
-      const year = date.getFullYear().toString().slice(2)
-      const monthInRoman = romanNumeral[month]
-      setValues({ ...values, invoice_number: `${invoice_number}/DDR/${monthInRoman}/${year}` })
-    },
-    onError(err) {
-      console.log(err)
-    },
-    fetchPolicy: 'cache-and-network',
-  })
-  const [getAllSettingService] = useLazyQuery(GET_ALL_SETTING_SERVICE, {
+  const [addNewInvoice] = useMutation(ADD_INVOICE_BEFORE)
+  const { loading: loadingSetting } = useQuery(GET_ALL_SETTING_SERVICE, {
     onCompleted: (data) => {
       setSettingServiceList(data.getAllSettingService)
     },
@@ -74,19 +62,6 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     },
     fetchPolicy: 'cache-and-network',
   })
-
-  useEffect(() => {
-    const monthStart = date.toISOString().slice(0, 7)
-    getInvoiceByMonth({
-      variables: {
-        input: {
-          this_month: monthStart,
-        },
-      },
-    })
-    getAllSettingService()
-    // eslint-disable-next-line
-  }, [])
 
   const capitalizeString = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
@@ -115,8 +90,15 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     newValues[i]['total'] = newValues[i]['quantity'] * newValues[i]['price']
     setArrayInput(newValues)
   }
+  const onChangeBefore = (e) => {
+    setValues({
+      ...values,
+      [e.target.name]: e.target.value,
+    })
+  }
   const onSubmit = async (e) => {
     e.preventDefault()
+
     let total_invoice = 0
     const newArrayInput = arrayInput.map((el) => {
       total_invoice += el.total
@@ -139,7 +121,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
           },
         })
         setRefreshTrigger(true)
-        setInvoiceModal(false)
+        setInvoiceBeforeModal(false)
       } catch (error) {
         toast.error(error.graphQLErrors[0].message)
       }
@@ -148,19 +130,52 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
   return (
     <CModal
       size="lg"
-      visible={invoiceModal}
-      onClose={() => setInvoiceModal(false)}
+      visible={invoiceBeforeModal}
+      onClose={() => setInvoiceBeforeModal(false)}
       backdrop="static"
     >
       <CModalHeader closeButton>
-        <CModalTitle>Tambah Invoice Baru</CModalTitle>
+        <CModalTitle>Tambah Data Terdahulu</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CForm onSubmit={onSubmit}>
+          <CRow className="mb-3 justify-content-center">
+            <CCol sm="4" className="pb-2">
+              <CFormLabel>No. Invoice</CFormLabel>
+              <CFormInput
+                type="text"
+                placeholder="1/DDR/IV/23"
+                name="invoice_number"
+                value={values.invoice_number}
+                onChange={onChangeBefore}
+                required
+              />
+            </CCol>
+            <CCol sm="4" className="pb-2">
+              <CFormLabel>Tanggal Estimasi</CFormLabel>
+              <CFormInput
+                type="date"
+                name="estimated_date"
+                value={values.estimated_date}
+                onChange={onChangeBefore}
+                required
+              />
+            </CCol>
+            <CCol sm="4" className="pb-2">
+              <CFormLabel>Tanggal Dikerjakan</CFormLabel>
+              <CFormInput
+                type="date"
+                name="ongoing_date"
+                value={values.ongoing_date}
+                onChange={onChangeBefore}
+                required
+              />
+            </CCol>
+          </CRow>
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
               <CCol sm="3" className="pb-2">
-                {settingServiceList && settingServiceList.length !== 0 && (
+                {!loadingSetting && settingServiceList && settingServiceList.length !== 0 && (
                   <>
                     <CFormInput
                       list="dataService"
@@ -172,7 +187,12 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
                     />
                     <datalist id="dataService">
                       {settingServiceList.map((item) => (
-                        <option key={item._id} value={item._service_name}>
+                        <option
+                          key={item._id}
+                          value={item._service_name}
+                          id={item._id}
+                          defaultValue={item._id}
+                        >
                           {capitalizeString(item.service_name)}
                         </option>
                       ))}
@@ -241,4 +261,4 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
   )
 }
 
-export default AddInvoiceModal
+export default AddInvoiceBeforeModal

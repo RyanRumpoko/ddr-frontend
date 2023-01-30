@@ -32,6 +32,9 @@ const GET_CUSTOMERS_PAGINATION_BY_MONTH = gql`
       brand
       type
       plate_number
+      color
+      transmission
+      year
     }
   }
 `
@@ -85,6 +88,7 @@ const CustomersList = () => {
   const [totalPage, setTotalPage] = useState()
   const [perPage] = useState(25)
   const [isSearching, setIsSearching] = useState(false)
+  const [totalData, setTotalData] = useState(0)
 
   let navigate = useNavigate()
   const date = new Date()
@@ -109,6 +113,7 @@ const CustomersList = () => {
           countArray.push({ i, hidden: true })
         }
       }
+      setTotalData(data.getTotalCustomersPaginationByMonth)
       setTotalPage(countArray)
     },
   })
@@ -123,6 +128,7 @@ const CustomersList = () => {
           countArray.push({ i, hidden: true })
         }
       }
+      setTotalData(data.searchCustomer.totalSearchData)
       setTotalPage(countArray)
       setCustomerList(data.searchCustomer.searchData)
     },
@@ -384,9 +390,7 @@ const CustomersList = () => {
         <CCardBody>
           <CRow>
             <CCol lg="12">
-              {customerList && (
-                <div className="mt-2 float-end">Total data: {customerList.length}</div>
-              )}
+              {customerList && <div className="mt-2 float-end">Total data: {totalData}</div>}
             </CCol>
           </CRow>
           <CTable>
