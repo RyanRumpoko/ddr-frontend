@@ -16,19 +16,23 @@ import {
 import { useLocation } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
 import { toast, ToastContainer } from 'react-toastify'
-import axios from 'axios'
-import FileSaver from 'file-saver'
+// import axios from 'axios'
+// import * as FileSaver from 'file-saver'
 import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
 import AddServiceModal from './AddServiceModal'
+// import XLSX from 'sheetjs-style'
 
-const routing = process.env.REACT_APP_REST_ENDPOINT_LOCAL
+// const routing = process.env.REACT_APP_REST_ENDPOINT_LOCAL
 
 const GET_SERVICES_BY_INVOICE_ID = gql`
   query GetServicesByInvoiceId($id: ID) {
     getServicesByInvoiceId(id: $id) {
       _id
-      service_name
+      service_name {
+        _id
+        service_name
+      }
       quantity
       price
       total
@@ -57,7 +61,7 @@ const InvoiceDetail = () => {
       const newServiceData = []
 
       data.getServicesByInvoiceId.forEach((item) => {
-        if (item.service_name === 'discount') {
+        if (item.service_name.service_name === 'discount') {
           totalDisc = item.total
           setDataDisc(item)
         } else {
@@ -113,34 +117,55 @@ const InvoiceDetail = () => {
   const downloadHandler = async (e) => {
     e.preventDefault()
 
-    await axios
-      .post(
-        `${routing}download/invoice`,
-        {
-          _id: state._id,
-        },
-        {
-          responseType: 'arraybuffer',
-        },
-      )
-      .then((data) => {
-        let blob = new Blob([data.data], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        })
-        const dateNow = new Date()
-        const month =
-          dateNow.getMonth() + 1 < 10 ? `0${dateNow.getMonth() + 1}` : dateNow.getMonth() + 1
-        const date = dateNow.getDate() < 10 ? `0${dateNow.getDate()}` : dateNow.getDate()
-        const year = dateNow.getFullYear()
-        const pattern = /\//g
-        const fileName = `invoice-${state.invoice_number
-          .toLowerCase()
-          .replace(pattern, '')}-${date}${month}${year}`
-        FileSaver.saveAs(blob, fileName)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    console.log(serviceList)
+    // const fileType =
+    //   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    // const fileExtension = '.xlsx'
+    // const excelData = [
+    //   {
+    //     'First Name': 'Arul',
+    //     'Last Name': 'Prasath',
+    //   },
+    //   {
+    //     'First Name': 'Balu',
+    //     'Last Name': 'Subramani',
+    //   },
+    // ]
+
+    // const ws = XLSX.utils.json_to_sheet(serviceList)
+    // const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+    // const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    // const data = new Blob([excelBuffer], { type: fileType })
+    // FileSaver.saveAs(data, 'Excel Export' + fileExtension)
+
+    // await axios
+    //   .post(
+    //     `${routing}download/invoice`,
+    //     {
+    //       _id: state._id,
+    //     },
+    //     {
+    //       responseType: 'arraybuffer',
+    //     },
+    //   )
+    //   .then((data) => {
+    //     let blob = new Blob([data.data], {
+    //       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    //     })
+    //     const dateNow = new Date()
+    //     const month =
+    //       dateNow.getMonth() + 1 < 10 ? `0${dateNow.getMonth() + 1}` : dateNow.getMonth() + 1
+    //     const date = dateNow.getDate() < 10 ? `0${dateNow.getDate()}` : dateNow.getDate()
+    //     const year = dateNow.getFullYear()
+    //     const pattern = /\//g
+    //     const fileName = `invoice-${state.invoice_number
+    //       .toLowerCase()
+    //       .replace(pattern, '')}-${date}${month}${year}`
+    //     FileSaver.saveAs(blob, fileName)
+    //   })
+    //   .catch((err) => {
+    //     console.log(err)
+    //   })
   }
   if (refreshTrigger) {
     refetch()
@@ -223,7 +248,9 @@ const InvoiceDetail = () => {
               serviceList.map((item, idx) => (
                 <CTableRow key={item._id}>
                   <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                  <CTableDataCell>{capitalizeString(item.service_name)}</CTableDataCell>
+                  <CTableDataCell>
+                    {capitalizeString(item.service_name.service_name)}
+                  </CTableDataCell>
                   <CTableDataCell>{item.quantity}</CTableDataCell>
                   <CTableDataCell>{localString(item.price)}</CTableDataCell>
                   <CTableDataCell>{localString(item.total)}</CTableDataCell>

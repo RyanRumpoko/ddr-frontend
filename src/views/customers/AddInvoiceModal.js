@@ -99,6 +99,12 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     newValues.splice(i, 1)
     setArrayInput(newValues)
   }
+  const errors = []
+  const notify = () => {
+    for (let i = 0; i < errors.length; i++) {
+      return errors[i]
+    }
+  }
   const onChange = (i, e) => {
     let newValues = [...arrayInput]
     if (e.target.name === 'service_name') {
@@ -112,20 +118,31 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
   const onSubmit = async (e) => {
     e.preventDefault()
     let total_invoice = 0
-    arrayInput.forEach((el) => {
+    const newArrayInput = arrayInput.map((el) => {
       total_invoice += el.total
+      const getServiceId = settingServiceList.find(
+        (item) => item.service_name === el.service_name.toLocaleLowerCase(),
+      )
+      if (!getServiceId) {
+        return errors.push(
+          toast.error(`Nama setting "${el.service_name.toLocaleLowerCase()}" belum terdaftar`),
+        )
+      } else return { ...el, service_name: getServiceId._id }
     })
-
-    try {
-      await addNewInvoice({
-        variables: {
-          input: { ...values, service_bulk: arrayInput, total_invoice },
-        },
-      })
-      setRefreshTrigger(true)
-      setInvoiceModal(false)
-    } catch (error) {
-      toast.error(error.graphQLErrors[0].message)
+    if (errors.length > 0) {
+      notify()
+    } else {
+      try {
+        await addNewInvoice({
+          variables: {
+            input: { ...values, service_bulk: newArrayInput, total_invoice },
+          },
+        })
+        setRefreshTrigger(true)
+        setInvoiceModal(false)
+      } catch (error) {
+        toast.error(error.graphQLErrors[0].message)
+      }
     }
   }
   return (
@@ -142,7 +159,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
         <CForm onSubmit={onSubmit}>
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
-              <CCol sm="3" className="pb-2">
+              <CCol sm="4" className="pb-2">
                 {settingServiceList && settingServiceList.length !== 0 && (
                   <>
                     <CFormInput
@@ -163,7 +180,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
                   </>
                 )}
               </CCol>
-              <CCol sm="2" className="pb-2">
+              <CCol sm="1" className="pb-2">
                 <CFormInput
                   type="text"
                   placeholder="Jumlah"

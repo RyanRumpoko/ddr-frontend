@@ -32,6 +32,8 @@ const GET_CUSTOMERS_PAGINATION_BY_MONTH = gql`
       brand
       type
       plate_number
+      color
+      transmission
     }
   }
 `

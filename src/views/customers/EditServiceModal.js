@@ -16,7 +16,9 @@ import { toast } from 'react-toastify'
 const GET_SERVICE_BY_ID = gql`
   query GetServiceById($id: ID) {
     getServiceById(id: $id) {
-      service_name
+      service_name {
+        service_name
+      }
       quantity
       price
       total
@@ -60,7 +62,10 @@ const EditServiceModal = ({
 
   const { loading: loadingService } = useQuery(GET_SERVICE_BY_ID, {
     onCompleted: (data) => {
-      setValues(data.getServiceById)
+      setValues({
+        ...data.getServiceById,
+        service_name: data.getServiceById.service_name.service_name,
+      })
     },
     onError(err) {
       console.log(err)
@@ -80,9 +85,7 @@ const EditServiceModal = ({
   const [updateService] = useMutation(UPDATE_SERVICE)
 
   useEffect(() => {
-    if (!isDisc) {
-      getSettingService()
-    }
+    getSettingService()
     // eslint-disable-next-line
   }, [])
 
@@ -135,6 +138,14 @@ const EditServiceModal = ({
     e.preventDefault()
     validate()
 
+    const getServiceId = settingServiceList.find(
+      (item) => item.service_name === values.service_name.toLocaleLowerCase(),
+    )
+    if (!getServiceId)
+      errors.push(
+        toast.error(`Nama setting "${values.service_name.toLocaleLowerCase()}" belum terdaftar`),
+      )
+
     if (errors.length > 0) {
       notify()
     } else {
@@ -143,7 +154,7 @@ const EditServiceModal = ({
           variables: {
             input: {
               _id,
-              service_name: values.service_name,
+              service_name: getServiceId._id,
               quantity: values.quantity,
               price: values.price,
               total: values.total,
@@ -167,26 +178,29 @@ const EditServiceModal = ({
         {!loadingService && (
           <CForm onSubmit={onSubmit}>
             <CRow className="mb-3 justify-content-center">
-              <CCol sm="3" className="pb-2">
-                {!loadingSetting && settingServiceList && settingServiceList.length !== 0 && (
-                  <>
-                    <CFormInput
-                      list="dataService"
-                      placeholder="Nama Barang"
-                      name="service_name"
-                      value={values.service_name}
-                      onChange={onChange}
-                      required
-                    />
-                    <datalist id="dataService">
-                      {settingServiceList.map((item) => (
-                        <option key={item._id} value={item._service_name}>
-                          {capitalizeString(item.service_name)}
-                        </option>
-                      ))}
-                    </datalist>
-                  </>
-                )}
+              <CCol sm="4" className="pb-2">
+                {!loadingSetting &&
+                  settingServiceList &&
+                  settingServiceList.length !== 0 &&
+                  !isDisc && (
+                    <>
+                      <CFormInput
+                        list="dataService"
+                        placeholder="Nama Barang"
+                        name="service_name"
+                        value={values.service_name}
+                        onChange={onChange}
+                        required
+                      />
+                      <datalist id="dataService">
+                        {settingServiceList.map((item) => (
+                          <option key={item._id} value={item._service_name}>
+                            {capitalizeString(item.service_name)}
+                          </option>
+                        ))}
+                      </datalist>
+                    </>
+                  )}
                 {isDisc && (
                   <CFormInput
                     type="text"
@@ -199,7 +213,7 @@ const EditServiceModal = ({
                   />
                 )}
               </CCol>
-              <CCol sm="2" className="pb-2">
+              <CCol sm="1" className="pb-2">
                 <CFormInput
                   type="text"
                   placeholder="Jumlah"
