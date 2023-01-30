@@ -44,6 +44,7 @@ const SettingService = () => {
   const [perPage] = useState(25)
   const [settingServiceModal, setSettingServiceModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
+  const [totalData, setTotalData] = useState(0)
 
   const [getAllSetting, { loading }] = useLazyQuery(GET_ALL_SETTING_SERVICE_PAGINATION, {
     onCompleted: (data) => {
@@ -65,6 +66,7 @@ const SettingService = () => {
           countArray.push({ i, hidden: true })
         }
       }
+      setTotalData(data.getTotalAllSettingService)
       setTotalPage(countArray)
     },
   })
@@ -137,9 +139,7 @@ const SettingService = () => {
         </CRow>
         <CRow>
           <CCol lg="12">
-            {settingServiceList && (
-              <div className="mt-2 float-end">Total data: {settingServiceList.length}</div>
-            )}
+            {settingServiceList && <div className="mt-2 float-end">Total data: {totalData}</div>}
           </CCol>
         </CRow>
         <CTable>

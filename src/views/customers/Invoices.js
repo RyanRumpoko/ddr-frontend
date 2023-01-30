@@ -100,6 +100,9 @@ const Invoices = () => {
     setItemUpdateStatus({ _id: item._id, status: item.status })
     setUpdateStatusModal(!updateStatusModal)
   }
+  const editHandler = () => {
+    navigate('/customers/list/edit', { state })
+  }
   const localString = (number) => {
     return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
   }
@@ -114,7 +117,8 @@ const Invoices = () => {
     setIsUpdateStatus(false)
   }
   const capitalizeString = (string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1)
+    const changeUnderscore = string.replace(/_/g, ' ')
+    return changeUnderscore.charAt(0).toUpperCase() + changeUnderscore.slice(1)
   }
 
   return (
@@ -122,7 +126,21 @@ const Invoices = () => {
       <CCol lg="6" sm="12">
         <CCard className="mt-3">
           <CCardHeader>
-            <h3>Detail Customer</h3>
+            <CRow className="d-flex align-items-center justify-content-center">
+              <CCol sm="8">
+                <h3>Detail Customer</h3>
+              </CCol>
+              <CCol sm="4">
+                <CButton
+                  color="warning"
+                  className="float-end text-white ms-2 mb-1"
+                  onClick={editHandler}
+                  size="sm"
+                >
+                  Edit Customer
+                </CButton>
+              </CCol>
+            </CRow>
           </CCardHeader>
           <CCardBody>
             <table className="table table-striped table-hover">
@@ -152,6 +170,10 @@ const Invoices = () => {
                 <tr>
                   <td>Transmisi</td>
                   <td>{capitalizeString(state.transmission)}</td>
+                </tr>
+                <tr>
+                  <td>Tahun</td>
+                  <td>{capitalizeString(state.year)}</td>
                 </tr>
               </tbody>
             </table>

@@ -159,7 +159,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
         <CForm onSubmit={onSubmit}>
           {arrayInput.map((el, idx) => (
             <CRow className="mb-3 justify-content-center" key={idx}>
-              <CCol sm="4" className="pb-2">
+              <CCol sm="3" className="pb-2">
                 {settingServiceList && settingServiceList.length !== 0 && (
                   <>
                     <CFormInput
@@ -180,7 +180,7 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
                   </>
                 )}
               </CCol>
-              <CCol sm="1" className="pb-2">
+              <CCol sm="2" className="pb-2">
                 <CFormInput
                   type="text"
                   placeholder="Jumlah"

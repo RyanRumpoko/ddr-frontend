@@ -178,7 +178,7 @@ const EditServiceModal = ({
         {!loadingService && (
           <CForm onSubmit={onSubmit}>
             <CRow className="mb-3 justify-content-center">
-              <CCol sm="4" className="pb-2">
+              <CCol sm="3" className="pb-2">
                 {!loadingSetting &&
                   settingServiceList &&
                   settingServiceList.length !== 0 &&
@@ -213,7 +213,7 @@ const EditServiceModal = ({
                   />
                 )}
               </CCol>
-              <CCol sm="1" className="pb-2">
+              <CCol sm="2" className="pb-2">
                 <CFormInput
                   type="text"
                   placeholder="Jumlah"
