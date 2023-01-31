@@ -16,14 +16,11 @@ import {
 import { useLocation } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
 import { toast, ToastContainer } from 'react-toastify'
-import axios from 'axios'
 import FileSaver from 'file-saver'
 import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
 import AddServiceModal from './AddServiceModal'
-// import XLSX from 'sheetjs-style'
-
-const routing = process.env.REACT_APP_REST_ENDPOINT_CYCLIC
+import XLSX from 'sheetjs-style'
 
 const GET_SERVICES_BY_INVOICE_ID = gql`
   query GetServicesByInvoiceId($id: ID) {
@@ -36,6 +33,23 @@ const GET_SERVICES_BY_INVOICE_ID = gql`
       quantity
       price
       total
+    }
+  }
+`
+
+const GET_INVOICE_BY_ID = gql`
+  query GetInvoiceById($_id: ID) {
+    getInvoiceById(_id: $_id) {
+      customer_id {
+        name
+        phone_number
+        brand
+        type
+        year
+        transmission
+        color
+        plate_number
+      }
     }
   }
 `
@@ -83,6 +97,11 @@ const InvoiceDetail = () => {
     fetchPolicy: 'cache-and-network',
   })
 
+  const { data: dataCustomer, loading: loadingCustomer } = useQuery(GET_INVOICE_BY_ID, {
+    variables: { _id: state._id },
+    fetchPolicy: 'cache-and-network',
+  })
+
   const capitalizeString = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
   }
@@ -117,55 +136,65 @@ const InvoiceDetail = () => {
   const downloadHandler = async (e) => {
     e.preventDefault()
 
-    console.log(serviceList)
-    // const fileType =
-    //   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
-    // const fileExtension = '.xlsx'
-    // const excelData = [
-    //   {
-    //     'First Name': 'Arul',
-    //     'Last Name': 'Prasath',
-    //   },
-    //   {
-    //     'First Name': 'Balu',
-    //     'Last Name': 'Subramani',
-    //   },
-    // ]
+    const dateNow = new Date()
+    const month =
+      dateNow.getMonth() + 1 < 10 ? `0${dateNow.getMonth() + 1}` : dateNow.getMonth() + 1
+    const date = dateNow.getDate() < 10 ? `0${dateNow.getDate()}` : dateNow.getDate()
+    const fullyear = dateNow.getFullYear()
+    const pattern = /\//g
+    const fileName = `invoice-${state.invoice_number
+      .toLowerCase()
+      .replace(pattern, '')}-${date}${month}${fullyear}`
+    const fileType =
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    const fileExtension = '.xlsx'
+    let totalDiscount = 0
 
-    // const ws = XLSX.utils.json_to_sheet(serviceList)
-    // const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
-    // const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
-    // const data = new Blob([excelBuffer], { type: fileType })
-    // FileSaver.saveAs(data, 'Excel Export' + fileExtension)
-
-    await axios
-      .post(
-        `${routing}download/invoice`,
-        {
-          _id: state._id,
-        },
-        {
-          responseType: 'arraybuffer',
-        },
+    const { name, phone_number, brand, type, year, transmission, color, plate_number } =
+      dataCustomer.getInvoiceById.customer_id
+    const excelData = [
+      [],
+      ['NAMA', `: ${name.toUpperCase()}`],
+      ['NO TELEPON', `: 0${phone_number}`],
+      [
+        'JENIS MOBIL',
+        `: ${brand.toUpperCase()} ${type
+          .replace(/_/g, ' ')
+          .toUpperCase()} / ${transmission.toUpperCase()} / ${year.toUpperCase()} / ${color.toUpperCase()}`,
+      ],
+      ['PLAT NOMOR', `: ${plate_number.toUpperCase()}`],
+      ['NO INVOICE', `: ${state.invoice_number}`],
+      [],
+      ['BANYAKNYA', 'NAMA BARANG', 'HARGA', 'JUMLAH'],
+    ]
+    serviceList.forEach((el) => {
+      if (el.service_name.service_name === 'discount') {
+        totalDiscount += el.total
+      } else {
+        excelData.push([
+          el.quantity,
+          el.service_name.service_name.toUpperCase(),
+          el.price,
+          el.total,
+        ])
+      }
+    })
+    if (totalDiscount > 0) {
+      excelData.push(
+        [],
+        ['', '', 'DISCOUNT', totalDiscount],
+        ['', '', 'TOTAL', state.total_invoice],
       )
-      .then((data) => {
-        let blob = new Blob([data.data], {
-          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        })
-        const dateNow = new Date()
-        const month =
-          dateNow.getMonth() + 1 < 10 ? `0${dateNow.getMonth() + 1}` : dateNow.getMonth() + 1
-        const date = dateNow.getDate() < 10 ? `0${dateNow.getDate()}` : dateNow.getDate()
-        const year = dateNow.getFullYear()
-        const pattern = /\//g
-        const fileName = `invoice-${state.invoice_number
-          .toLowerCase()
-          .replace(pattern, '')}-${date}${month}${year}`
-        FileSaver.saveAs(blob, fileName)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    } else {
+      excelData.push([], ['', '', 'TOTAL', state.total_invoice])
+    }
+
+    const ws = XLSX.utils.aoa_to_sheet(excelData)
+    const wb = { Sheets: { data: ws }, SheetNames: ['data'] }
+    ws['!cols'] = [{ wch: 15 }, { wch: 35 }, { wch: 15 }, { wch: 15 }]
+    const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' })
+    const data = new Blob([excelBuffer], { type: fileType })
+    FileSaver.saveAs(data, fileName + fileExtension)
   }
   if (refreshTrigger) {
     refetch()
@@ -217,14 +246,16 @@ const InvoiceDetail = () => {
         </CRow>
         <CRow>
           <CCol lg="6">
-            <CButton
-              size="sm"
-              color="info text-white"
-              onClick={downloadHandler}
-              disabled={state.status !== 'done'}
-            >
-              Download Invoice
-            </CButton>
+            {serviceList && serviceList.length !== 0 && !loadingCustomer && (
+              <CButton
+                size="sm"
+                color="info text-white"
+                onClick={downloadHandler}
+                disabled={state.status !== 'done'}
+              >
+                Download Invoice
+              </CButton>
+            )}
           </CCol>
           <CCol lg="6">
             {serviceList && <div className="mt-2 float-end">Total data: {serviceList.length}</div>}
