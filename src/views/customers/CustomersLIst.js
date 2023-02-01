@@ -56,6 +56,9 @@ const SEARCH_CUSTOMER = gql`
         brand
         type
         plate_number
+        color
+        transmission
+        year
       }
     }
   }
