@@ -21,6 +21,7 @@ import AddInvoiceBeforeModal from './AddInvoiceBeforeModal'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthContext } from 'src/context/auth'
+import moment from 'moment'
 
 const GET_INVOICES_BY_CUSTOMER_ID = gql`
   query GetInvoiceByCustomerId($id: ID) {
@@ -29,6 +30,8 @@ const GET_INVOICES_BY_CUSTOMER_ID = gql`
       invoice_number
       status
       total_invoice
+      estimated_date
+      ongoing_date
     }
   }
 `
@@ -102,9 +105,6 @@ const Invoices = () => {
   }
   const editHandler = () => {
     navigate('/customers/list/edit', { state })
-  }
-  const localString = (number) => {
-    return number.toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
   }
   if (refreshTrigger) {
     refetch()
@@ -217,7 +217,7 @@ const Invoices = () => {
                   <CTableHeaderCell scope="col">#</CTableHeaderCell>
                   <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Total Invoice</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Tgl Invoice</CTableHeaderCell>
                   <CTableHeaderCell scope="col"></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -230,7 +230,9 @@ const Invoices = () => {
                       <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
                       <CTableDataCell>{item.invoice_number}</CTableDataCell>
                       <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
-                      <CTableDataCell>{localString(item.total_invoice)}</CTableDataCell>
+                      <CTableDataCell>
+                        {moment(item.estimated_date).format('D MMM YYYY')}
+                      </CTableDataCell>
                       <CTableDataCell>
                         <CButton
                           color="warning"
