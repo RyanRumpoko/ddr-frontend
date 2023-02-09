@@ -21,6 +21,7 @@ import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
 import AddServiceModal from './AddServiceModal'
 import XLSX from 'sheetjs-style'
+import moment from 'moment'
 
 const GET_SERVICES_BY_INVOICE_ID = gql`
   query GetServicesByInvoiceId($id: ID) {
@@ -148,7 +149,6 @@ const InvoiceDetail = () => {
     const fileType =
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
     const fileExtension = '.xlsx'
-    let totalDiscount = 0
 
     const { name, phone_number, brand, type, year, transmission, color, plate_number } =
       dataCustomer.getInvoiceById.customer_id
@@ -164,25 +164,17 @@ const InvoiceDetail = () => {
       ],
       ['PLAT NOMOR', `: ${plate_number.toUpperCase()}`],
       ['NO INVOICE', `: ${state.invoice_number}`],
+      ['TGL INVOICE', `: ${moment(state.ongoing_date).format('D MMMM YYYY')}`],
       [],
       ['BANYAKNYA', 'NAMA BARANG', 'HARGA', 'JUMLAH'],
     ]
     serviceList.forEach((el) => {
-      if (el.service_name.service_name === 'discount') {
-        totalDiscount += el.total
-      } else {
-        excelData.push([
-          el.quantity,
-          el.service_name.service_name.toUpperCase(),
-          el.price,
-          el.total,
-        ])
-      }
+      excelData.push([el.quantity, el.service_name.service_name.toUpperCase(), el.price, el.total])
     })
-    if (totalDiscount > 0) {
+    if (dataDisc) {
       excelData.push(
         [],
-        ['', '', 'DISCOUNT', totalDiscount],
+        ['', '', 'DISCOUNT', dataDisc.total],
         ['', '', 'TOTAL', state.total_invoice],
       )
     } else {
@@ -208,7 +200,7 @@ const InvoiceDetail = () => {
       <CCardHeader>
         <CRow className="d-flex align-items-center justify-content-center">
           <CCol sm="8">
-            <h3>List Service Invoice {state.invoice_number}</h3>
+            <h3>List Service Invoice</h3>
           </CCol>
           <CCol sm="4">
             <CButton
@@ -232,6 +224,14 @@ const InvoiceDetail = () => {
         </CRow>
       </CCardHeader>
       <CCardBody>
+        <CRow className="mb-3">
+          <CCol lg="12" className="h5">
+            No Invoice : {state.invoice_number}
+          </CCol>
+          <CCol lg="12" className="h5">
+            Tanggal Invoice : {moment(state.estimated_date).format('D MMMM YYYY')}
+          </CCol>
+        </CRow>
         <CRow className="justify-content-center">
           <CCol sm="6" className="mb-3 text-center">
             <CButton

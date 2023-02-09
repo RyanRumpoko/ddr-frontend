@@ -83,6 +83,8 @@ const CustomersList = () => {
     color: '',
     transmission: '',
     year: '',
+    // invoice_date_min: '',
+    // invoice_date_max: '',
   }
   const [searchValues, setSearchValues] = useState(DEFAULT_STATE)
   const [customerList, setCustomerList] = useState([])
@@ -363,6 +365,26 @@ const CustomersList = () => {
                   />
                 </CCol>
               </CRow>
+              {/* <hr className="my-4" />
+              <CRow className="my-3">
+                <CCol sm="2">Tanggal Invoice [Dari] - [Ke]</CCol>
+                <CCol sm="2">
+                  <CFormInput
+                    type="date"
+                    name="invoice_date_min"
+                    values={searchValues.invoice_date_min}
+                    onChange={(e) => onChange(e)}
+                  />
+                </CCol>
+                <CCol sm="2">
+                  <CFormInput
+                    type="date"
+                    name="invoice_date_max"
+                    values={searchValues.invoice_date_max}
+                    onChange={(e) => onChange(e)}
+                  />
+                </CCol>
+              </CRow> */}
               <CRow className="justify-content-between">
                 <CCol sm="12">
                   <div className="mt-2 float-end">
