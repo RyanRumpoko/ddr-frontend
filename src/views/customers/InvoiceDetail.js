@@ -12,6 +12,7 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
+  CCardFooter,
 } from '@coreui/react'
 import { useLocation } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
@@ -20,6 +21,7 @@ import FileSaver from 'file-saver'
 import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
 import AddServiceModal from './AddServiceModal'
+import AddNoteModal from './AddNoteModal'
 import XLSX from 'sheetjs-style'
 import moment from 'moment'
 
@@ -41,6 +43,9 @@ const GET_SERVICES_BY_INVOICE_ID = gql`
 const GET_INVOICE_BY_ID = gql`
   query GetInvoiceById($_id: ID) {
     getInvoiceById(_id: $_id) {
+      invoice_number
+      estimated_date
+      note
       customer_id {
         name
         phone_number
@@ -63,8 +68,10 @@ const InvoiceDetail = () => {
   const [editServiceModal, setEditServiceModal] = useState(false)
   const [deleteModal, setDeleteModal] = useState(false)
   const [addServiceModal, setAddServiceModal] = useState(false)
+  const [noteModal, setNoteModal] = useState(false)
   const [isDisc, setIsDisc] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
+  const [noteRefreshTrigger, setNoteRefreshTrigger] = useState(false)
   const [editId, setEditId] = useState('')
   const [deleteId, setDeleteId] = useState('')
   const [dataDisc, setDataDisc] = useState()
@@ -98,7 +105,11 @@ const InvoiceDetail = () => {
     fetchPolicy: 'cache-and-network',
   })
 
-  const { data: dataCustomer, loading: loadingCustomer } = useQuery(GET_INVOICE_BY_ID, {
+  const {
+    data: dataCustomer,
+    loading: loadingCustomer,
+    refetch: refetchInvoice,
+  } = useQuery(GET_INVOICE_BY_ID, {
     variables: { _id: state._id },
     fetchPolicy: 'cache-and-network',
   })
@@ -133,6 +144,9 @@ const InvoiceDetail = () => {
   const addDiscHandler = () => {
     setIsDisc(!isDisc)
     setAddServiceModal(!addServiceModal)
+  }
+  const addNoteHandler = () => {
+    setNoteModal(!noteModal)
   }
   const downloadHandler = async (e) => {
     e.preventDefault()
@@ -194,9 +208,14 @@ const InvoiceDetail = () => {
     setIsDisc(false)
     toast.success('Invoice berhasil di update')
   }
+  if (noteRefreshTrigger) {
+    refetchInvoice()
+    setNoteRefreshTrigger(false)
+    toast.success('Note berhasil di update')
+  }
 
   return (
-    <CCard className="mt-3">
+    <CCard className="my-3">
       <CCardHeader>
         <CRow className="d-flex align-items-center justify-content-center">
           <CCol sm="8">
@@ -213,25 +232,37 @@ const InvoiceDetail = () => {
             </CButton>
             <CButton
               color="success"
-              className="float-end text-white mb-1"
+              className="float-end text-white ms-2 mb-1"
               style={{ width: '80px' }}
               onClick={addDiscHandler}
               size="sm"
             >
               Discount
             </CButton>
+            <CButton
+              color="primary"
+              className="float-end text-white mb-1"
+              style={{ width: '80px' }}
+              onClick={addNoteHandler}
+              size="sm"
+            >
+              Note
+            </CButton>
           </CCol>
         </CRow>
       </CCardHeader>
       <CCardBody>
-        <CRow className="mb-3">
-          <CCol lg="12" className="h5">
-            No Invoice : {state.invoice_number}
-          </CCol>
-          <CCol lg="12" className="h5">
-            Tanggal Invoice : {moment(state.estimated_date).format('D MMMM YYYY')}
-          </CCol>
-        </CRow>
+        {!loadingCustomer && dataCustomer && (
+          <CRow className="mb-3">
+            <CCol lg="12" className="h5">
+              No Invoice : {dataCustomer.getInvoiceById.invoice_number}
+            </CCol>
+            <CCol lg="12" className="h5">
+              Tanggal Invoice :{' '}
+              {moment(dataCustomer.getInvoiceById.estimated_date).format('D MMMM YYYY')}
+            </CCol>
+          </CRow>
+        )}
         <CRow className="justify-content-center">
           <CCol sm="6" className="mb-3 text-center">
             <CButton
@@ -349,6 +380,16 @@ const InvoiceDetail = () => {
           </CTableHead>
         </CTable>
       </CCardBody>
+      <CCardFooter>
+        {!loadingCustomer && dataCustomer && (
+          <CRow className="mb-3">
+            <CCol lg="12">
+              <h5>Note :</h5>
+              {dataCustomer.getInvoiceById.note ? dataCustomer.getInvoiceById.note : ''}
+            </CCol>
+          </CRow>
+        )}
+      </CCardFooter>
       {editServiceModal && editId && (
         <EditServiceModal
           _id={editId}
@@ -377,6 +418,15 @@ const InvoiceDetail = () => {
           setRefreshTrigger={setRefreshTrigger}
           isDisc={isDisc}
           setIsDisc={setIsDisc}
+        />
+      )}
+      {noteModal && !loadingCustomer && dataCustomer && (
+        <AddNoteModal
+          noteModal={noteModal}
+          setNoteModal={setNoteModal}
+          id={state._id}
+          setNoteRefreshTrigger={setNoteRefreshTrigger}
+          note={dataCustomer.getInvoiceById.note}
         />
       )}
       <ToastContainer />

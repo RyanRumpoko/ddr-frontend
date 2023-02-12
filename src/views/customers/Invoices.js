@@ -32,6 +32,7 @@ const GET_INVOICES_BY_CUSTOMER_ID = gql`
       total_invoice
       estimated_date
       ongoing_date
+      note
     }
   }
 `
@@ -143,40 +144,42 @@ const Invoices = () => {
             </CRow>
           </CCardHeader>
           <CCardBody>
-            <table className="table table-striped table-hover">
-              <tbody>
-                <tr>
-                  <td>Nama</td>
-                  <td>{capitalizeString(state.name)}</td>
-                </tr>
-                <tr>
-                  <td>No Telepon</td>
-                  <td>{`0${state.phone_number}`}</td>
-                </tr>
-                <tr>
-                  <td>Merk Mobil</td>
-                  <td>
-                    {capitalizeString(state.brand)} {capitalizeString(state.type)}
-                  </td>
-                </tr>
-                <tr>
-                  <td>No Polisi</td>
-                  <td>{state.plate_number.toUpperCase()}</td>
-                </tr>
-                <tr>
-                  <td>Warna</td>
-                  <td>{capitalizeString(state.color)}</td>
-                </tr>
-                <tr>
-                  <td>Transmisi</td>
-                  <td>{capitalizeString(state.transmission)}</td>
-                </tr>
-                <tr>
-                  <td>Tahun</td>
-                  <td>{capitalizeString(state.year)}</td>
-                </tr>
-              </tbody>
-            </table>
+            {state && (
+              <table className="table table-striped table-hover">
+                <tbody>
+                  <tr>
+                    <td>Nama</td>
+                    <td>{capitalizeString(state.name)}</td>
+                  </tr>
+                  <tr>
+                    <td>No Telepon</td>
+                    <td>{`0${state.phone_number}`}</td>
+                  </tr>
+                  <tr>
+                    <td>Merk Mobil</td>
+                    <td>
+                      {capitalizeString(state.brand)} {capitalizeString(state.type)}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>No Polisi</td>
+                    <td>{state.plate_number.toUpperCase()}</td>
+                  </tr>
+                  <tr>
+                    <td>Warna</td>
+                    <td>{capitalizeString(state.color)}</td>
+                  </tr>
+                  <tr>
+                    <td>Transmisi</td>
+                    <td>{capitalizeString(state.transmission)}</td>
+                  </tr>
+                  <tr>
+                    <td>Tahun</td>
+                    <td>{capitalizeString(state.year)}</td>
+                  </tr>
+                </tbody>
+              </table>
+            )}
           </CCardBody>
         </CCard>
       </CCol>
