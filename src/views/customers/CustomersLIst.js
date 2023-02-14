@@ -121,6 +121,7 @@ const CustomersList = () => {
   const [isSearching, setIsSearching] = useState(false)
   const [isInvoiceSearching, setIsInvoiceSearching] = useState(false)
   const [totalData, setTotalData] = useState(0)
+  const [isLaquo, setIsLaquo] = useState(false)
 
   let navigate = useNavigate()
   const date = new Date()
@@ -160,8 +161,10 @@ const CustomersList = () => {
           countArray.push({ i, hidden: true })
         }
       }
-      setTotalData(data.searchCustomer.totalSearchData)
-      setTotalPage(countArray)
+      if (!isLaquo) {
+        setTotalData(data.searchCustomer.totalSearchData)
+        setTotalPage(countArray)
+      }
       setCustomerList(data.searchCustomer.searchData)
     },
     onError(err) {
@@ -189,8 +192,10 @@ const CustomersList = () => {
           countArray.push({ i, hidden: true })
         }
       }
-      setTotalData(data.searchInvoice.totalSearchData)
-      setTotalPage(countArray)
+      if (!isLaquo) {
+        setTotalData(data.searchInvoice.totalSearchData)
+        setTotalPage(countArray)
+      }
       setCustomerList(data.searchInvoice.searchData)
     },
     onError(err) {
@@ -226,14 +231,17 @@ const CustomersList = () => {
           },
         },
       })
-      getTotalCustomerByMonth({
-        variables: {
-          input: {
-            this_month: monthStart,
+      if (!isLaquo) {
+        getTotalCustomerByMonth({
+          variables: {
+            input: {
+              this_month: monthStart,
+            },
           },
-        },
-      })
+        })
+      }
     }
+    setIsLaquo(false)
     // eslint-disable-next-line
   }, [currentPage])
 
@@ -245,6 +253,7 @@ const CustomersList = () => {
     navigate('/customers/list/invoices', { state: data })
   }
   const laquoHandler = (direction) => {
+    setIsLaquo(true)
     if (direction === 'left' && currentPage > 1) {
       setActivePage(currentPage - 1)
       const newPage = [...totalPage]
