@@ -221,6 +221,7 @@ const Invoices = () => {
                   <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Status</CTableHeaderCell>
                   <CTableHeaderCell scope="col">Tgl Invoice</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Tgl Selesai</CTableHeaderCell>
                   <CTableHeaderCell scope="col"></CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -235,6 +236,9 @@ const Invoices = () => {
                       <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
                       <CTableDataCell>
                         {moment(item.estimated_date).format('D MMM YYYY')}
+                      </CTableDataCell>
+                      <CTableDataCell>
+                        {item.ongoing_date ? moment(item.ongoing_date).format('D MMM YYYY') : '-'}
                       </CTableDataCell>
                       <CTableDataCell>
                         <CButton
