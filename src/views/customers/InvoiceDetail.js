@@ -178,7 +178,7 @@ const InvoiceDetail = () => {
       ],
       ['PLAT NOMOR', `: ${plate_number.toUpperCase()}`],
       ['NO INVOICE', `: ${state.invoice_number}`],
-      ['TGL INVOICE', `: ${moment(state.ongoing_date).format('D MMMM YYYY')}`],
+      ['TGL SELESAI', `: ${moment(state.ongoing_date).format('D MMMM YYYY')}`],
       [],
       ['BANYAKNYA', 'NAMA BARANG', 'HARGA', 'JUMLAH'],
     ]
