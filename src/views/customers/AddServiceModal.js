@@ -122,6 +122,9 @@ const AddServiceModal = ({
       errors.push(
         toast.error(`Nama setting "${values.service_name.toLocaleLowerCase()}" belum terdaftar`),
       )
+    if (!isDisc && values.service_name.toLocaleLowerCase() === 'discount') {
+      errors.push(toast.error(`Tidak dapat menambahkan diskon disini`))
+    }
 
     if (errors.length > 0) {
       notify()
@@ -142,7 +145,7 @@ const AddServiceModal = ({
   return (
     <CModal size="lg" visible={addServiceModal} onClose={onCloseHandler} backdrop="static">
       <CModalHeader closeButton>
-        <CModalTitle>Tambah Service</CModalTitle>
+        <CModalTitle>{isDisc ? 'Tambah Diskon' : 'Tambah Service'}</CModalTitle>
       </CModalHeader>
       <CModalBody>
         <CForm onSubmit={onSubmit}>

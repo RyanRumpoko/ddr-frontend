@@ -119,7 +119,9 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
     e.preventDefault()
     let total_invoice = 0
     const newArrayInput = arrayInput.map((el) => {
-      total_invoice += el.total
+      if (el.service_name.toLocaleLowerCase() === 'discount') total_invoice -= el.total
+      else total_invoice += el.total
+
       const getServiceId = settingServiceList.find(
         (item) => item.service_name === el.service_name.toLocaleLowerCase(),
       )
