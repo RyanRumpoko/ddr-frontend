@@ -6,6 +6,8 @@ import '@fortawesome/fontawesome-free/css/all.min.css'
 import { AuthProvider } from './context/auth'
 import { AuthRoute, AuthLogin } from './util/AuthRoute'
 
+import { ToastContainer } from 'react-toastify'
+
 const loading = (
   <div className="pt-3 text-center">
     <div className="sk-spinner sk-spinner-pulse"></div>
@@ -50,6 +52,7 @@ class App extends Component {
               />
             </Routes>
           </Suspense>
+          <ToastContainer />
         </HashRouter>
       </AuthProvider>
     )

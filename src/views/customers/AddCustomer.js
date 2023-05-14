@@ -11,7 +11,7 @@ import {
   CFormSelect,
 } from '@coreui/react'
 import { gql, useMutation, useQuery } from '@apollo/client'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const ADD_CUSTOMER = gql`
@@ -246,7 +246,6 @@ const AddCustomer = () => {
           </CRow>
         </CForm>
       </CCardBody>
-      <ToastContainer />
     </CCard>
   )
 }

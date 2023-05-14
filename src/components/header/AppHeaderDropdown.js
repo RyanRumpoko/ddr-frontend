@@ -12,7 +12,7 @@ import { cilSettings, cilAccountLogout } from '@coreui/icons'
 import CIcon from '@coreui/icons-react'
 import { useMutation, gql } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { AuthContext } from 'src/context/auth'
 import ChangePasswordModal from 'src/views/users/ChangePasswordModal'
 
@@ -75,7 +75,6 @@ const AppHeaderDropdown = () => {
           />
         )}
       </CDropdownMenu>
-      <ToastContainer />
     </CDropdown>
   )
 }

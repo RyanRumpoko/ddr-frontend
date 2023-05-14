@@ -14,7 +14,7 @@ import {
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked } from '@coreui/icons'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useMutation, gql } from '@apollo/client'
 
@@ -115,7 +115,6 @@ const ChangePasswordModal = ({
           </CForm>
         </CModalBody>
       </CModal>
-      <ToastContainer />
     </>
   )
 }

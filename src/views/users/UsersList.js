@@ -14,7 +14,7 @@ import {
   CTableDataCell,
 } from '@coreui/react'
 import { useQuery, gql } from '@apollo/client'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
 import AddUserModal from './AddUserModal'
 
@@ -131,7 +131,6 @@ const UsersList = () => {
           setRefreshTrigger={setRefreshTrigger}
         />
       )}
-      <ToastContainer />
     </CCard>
   )
 }

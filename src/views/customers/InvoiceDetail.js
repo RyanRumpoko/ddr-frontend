@@ -16,7 +16,7 @@ import {
 } from '@coreui/react'
 import { useLocation } from 'react-router-dom'
 import { useQuery, gql } from '@apollo/client'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import FileSaver from 'file-saver'
 import EditServiceModal from './EditServiceModal'
 import DeleteServiceModal from './DeleteServiceModal'
@@ -429,7 +429,6 @@ const InvoiceDetail = () => {
           note={dataCustomer.getInvoiceById.note}
         />
       )}
-      <ToastContainer />
     </CCard>
   )
 }

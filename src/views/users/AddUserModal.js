@@ -13,7 +13,7 @@ import {
   CButton,
 } from '@coreui/react'
 import { gql, useMutation } from '@apollo/client'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const ADD_USER = gql`
@@ -152,7 +152,6 @@ const AddUserModal = ({ userModal, setUserModal, setRefreshTrigger }) => {
           </CRow>
         </CForm>
       </CModalBody>
-      <ToastContainer />
     </CModal>
   )
 }

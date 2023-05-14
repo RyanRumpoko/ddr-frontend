@@ -238,7 +238,6 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
           </CRow>
         </CForm>
       </CModalBody>
-      {/* <ToastContainer /> */}
     </CModal>
   )
 }

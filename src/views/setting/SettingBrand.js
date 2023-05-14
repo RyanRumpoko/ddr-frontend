@@ -4,7 +4,6 @@ import {
   CCard,
   CCardBody,
   CCardHeader,
-  CCardFooter,
   CCol,
   CRow,
   CTable,
@@ -13,26 +12,24 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CPagination,
-  CPaginationItem,
 } from '@coreui/react'
-import { useQuery, useLazyQuery, gql } from '@apollo/client'
+import { useLazyQuery, gql } from '@apollo/client'
 import AddSettingBrandModal from './AddSettingBrandModal'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
+import { assignPagination } from 'src/util/Pagination'
+import PaginationComponent from '../components/PaginationComponent'
+import ItemsPerPageComponent from '../components/ItemsPerPageComponent'
 
 const GET_ALL_SETTING_BRAND_PAGINATION = gql`
   query GetAllSettingBrandPagination($input: GetSettingBrandPagination) {
     getAllSettingBrandPagination(input: $input) {
-      _id
-      brand_name
-      is_active
+      totalSearchData
+      searchData {
+        _id
+        brand_name
+        is_active
+      }
     }
-  }
-`
-
-const GET_TOTAL_SETTING_BRAND = gql`
-  query GetTotalSettingBrand {
-    getTotalAllSettingBrand
   }
 `
 
@@ -40,34 +37,31 @@ const SettingBrand = () => {
   const [settingBrandList, setSettingBrandList] = useState([])
   const [settingBrandModal, setSettingBrandModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
-  const [currentPage, setActivePage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState()
-  const [perPage] = useState(25)
+  const [perPage, setPerPage] = useState(25)
   const [totalData, setTotalData] = useState(0)
+  const [isChangingPage, setIsChangingPage] = useState(false)
+  const [totalPaginate, setTotalPaginate] = useState(0)
 
   const [getAllSetting, { loading }] = useLazyQuery(GET_ALL_SETTING_BRAND_PAGINATION, {
     onCompleted: (data) => {
-      setSettingBrandList(data.getAllSettingBrandPagination)
+      if (!isChangingPage) {
+        const pagination = assignPagination(
+          data.getAllSettingBrandPagination.totalSearchData,
+          perPage,
+        )
+        setTotalData(data.getAllSettingBrandPagination.totalSearchData)
+        setTotalPage(pagination.countArray)
+        setTotalPaginate(pagination.totalPaginate)
+      }
+      setSettingBrandList(data.getAllSettingBrandPagination.searchData)
+      setIsChangingPage(false)
     },
     onError(err) {
       console.log(err)
     },
     fetchPolicy: 'cache-and-network',
-  })
-  useQuery(GET_TOTAL_SETTING_BRAND, {
-    onCompleted: (data) => {
-      const count = Math.ceil(data.getTotalAllSettingBrand / perPage)
-      const countArray = []
-      for (let i = 1; i <= count; i++) {
-        if (i <= 3) {
-          countArray.push({ i, hidden: false })
-        } else {
-          countArray.push({ i, hidden: true })
-        }
-      }
-      setTotalData(data.getTotalAllSettingBrand)
-      setTotalPage(countArray)
-    },
   })
 
   useEffect(() => {
@@ -87,25 +81,6 @@ const SettingBrand = () => {
   }
   const addNewSettingService = () => {
     setSettingBrandModal(!settingBrandModal)
-  }
-  const laquoHandler = (direction) => {
-    if (direction === 'left' && currentPage > 1) {
-      setActivePage(currentPage - 1)
-      const newPage = [...totalPage]
-      if (currentPage + 2 <= totalPage.length) {
-        newPage[currentPage + 1].hidden = true
-        newPage[currentPage - 2].hidden = false
-      }
-      setTotalPage(newPage)
-    } else if (direction === 'right' && currentPage < totalPage.length) {
-      const newPage = [...totalPage]
-      if (totalPage.length - currentPage > 0 && currentPage > 2) {
-        newPage[currentPage - 3].hidden = true
-        newPage[currentPage].hidden = false
-      }
-      setTotalPage(newPage)
-      setActivePage(currentPage + 1)
-    }
   }
 
   if (refreshTrigger) {
@@ -139,6 +114,11 @@ const SettingBrand = () => {
             {settingBrandList && <div className="mt-2 float-end">Total data: {totalData}</div>}
           </CCol>
         </CRow>
+        <ItemsPerPageComponent
+          perPage={perPage}
+          setPerPage={setPerPage}
+          setCurrentPage={setCurrentPage}
+        />
         <CTable>
           <CTableHead>
             <CTableRow>
@@ -167,31 +147,16 @@ const SettingBrand = () => {
           <div className="text-center text-danger">Belum ada data</div>
         )}
       </CCardBody>
-      <CCardFooter className="d-flex justify-content-center align-item-center">
-        {totalPage && (
-          <CPagination>
-            <CPaginationItem onClick={() => laquoHandler('left')} disabled={currentPage === 1}>
-              Previous
-            </CPaginationItem>
-            {totalPage.map((item, idx) => (
-              <CPaginationItem
-                key={idx}
-                onClick={() => setActivePage(idx + 1)}
-                active={currentPage === idx + 1}
-                hidden={item.hidden}
-              >
-                {idx + 1}
-              </CPaginationItem>
-            ))}
-            <CPaginationItem
-              onClick={() => laquoHandler('right')}
-              disabled={currentPage === totalPage.length}
-            >
-              Next
-            </CPaginationItem>
-          </CPagination>
-        )}
-      </CCardFooter>
+      {totalPage && (
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPage={totalPage}
+          setCurrentPage={setCurrentPage}
+          setTotalPage={setTotalPage}
+          setIsChangingPage={setIsChangingPage}
+          totalPaginate={totalPaginate}
+        />
+      )}
       {settingBrandModal && (
         <AddSettingBrandModal
           settingBrandModal={settingBrandModal}
@@ -199,7 +164,6 @@ const SettingBrand = () => {
           setRefreshTrigger={setRefreshTrigger}
         />
       )}
-      <ToastContainer />
     </CCard>
   )
 }
