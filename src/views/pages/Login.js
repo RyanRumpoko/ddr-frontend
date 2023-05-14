@@ -15,7 +15,7 @@ import {
 import CIcon from '@coreui/icons-react'
 import { cilLockLocked, cilUser } from '@coreui/icons'
 import { useNavigate } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { gql, useMutation } from '@apollo/client'
 import { AuthContext } from 'src/context/auth'
@@ -128,7 +128,7 @@ const Login = () => {
                   </CForm>
                   <CRow>
                     <CCol sm="12" className="mt-2">
-                      <span className="float-end">Ver. 1.2.1</span>
+                      <span className="float-end">Ver. 1.2.2</span>
                     </CCol>
                   </CRow>
                 </CCardBody>
@@ -137,7 +137,6 @@ const Login = () => {
           </CCol>
         </CRow>
       </CContainer>
-      <ToastContainer />
     </div>
   )
 }

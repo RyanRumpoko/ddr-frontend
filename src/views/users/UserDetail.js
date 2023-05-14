@@ -5,7 +5,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import moment from 'moment'
 import { AuthContext } from 'src/context/auth'
 import ChangePasswordModal from './ChangePasswordModal'
-import { ToastContainer, toast } from 'react-toastify'
+import { toast } from 'react-toastify'
 
 const GET_USER_BY_ID = gql`
   query GetUserById($id: ID) {
@@ -102,7 +102,6 @@ const UserDetail = () => {
           </CCardBody>
         </CCard>
       </CCol>
-      <ToastContainer />
     </CRow>
   )
 }

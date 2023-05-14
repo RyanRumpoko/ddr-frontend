@@ -4,7 +4,6 @@ import {
   CCard,
   CCardBody,
   CCardHeader,
-  CCardFooter,
   CCol,
   CRow,
   CForm,
@@ -16,32 +15,30 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CPagination,
-  CPaginationItem,
 } from '@coreui/react'
 import { useQuery, useLazyQuery, gql } from '@apollo/client'
 import { useNavigate } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
+import { assignPagination } from 'src/util/Pagination'
+import PaginationComponent from '../components/PaginationComponent'
+import ItemsPerPageComponent from '../components/ItemsPerPageComponent'
 
 const GET_CUSTOMERS_PAGINATION_BY_MONTH = gql`
   query GetCustomersPaginationByMonth($input: GetCustomersPaginationByMonthInput) {
     getCustomersPaginationByMonth(input: $input) {
-      _id
-      name
-      phone_number
-      brand
-      type
-      plate_number
-      color
-      transmission
-      year
+      totalSearchData
+      searchData {
+        _id
+        name
+        phone_number
+        brand
+        type
+        plate_number
+        color
+        transmission
+        year
+      }
     }
-  }
-`
-
-const GET_TOTAL_CUSTOMERS_BY_MONTH = gql`
-  query getTotalCustomersPaginationByMonth($input: GetTotalCustomersPaginationByMonthInput) {
-    getTotalCustomersPaginationByMonth(input: $input)
   }
 `
 
@@ -115,57 +112,47 @@ const CustomersList = () => {
   const [searchInvoiceValues, setSearchInvoiceValues] = useState(DEFAULT_INVOICE_STATE)
   const [customerList, setCustomerList] = useState([])
   const [settingBrandList, setSettingBrandList] = useState([])
-  const [currentPage, setActivePage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState()
-  const [perPage] = useState(25)
+  const [perPage, setPerPage] = useState(25)
   const [isSearching, setIsSearching] = useState(false)
   const [isInvoiceSearching, setIsInvoiceSearching] = useState(false)
   const [totalData, setTotalData] = useState(0)
-  const [isLaquo, setIsLaquo] = useState(false)
+  const [isChangingPage, setIsChangingPage] = useState(false)
+  const [totalPaginate, setTotalPaginate] = useState(0)
 
   let navigate = useNavigate()
   const date = new Date()
 
   const [getCustomerByMonth, { loading }] = useLazyQuery(GET_CUSTOMERS_PAGINATION_BY_MONTH, {
     onCompleted: (data) => {
-      setCustomerList(data.getCustomersPaginationByMonth)
+      if (!isChangingPage) {
+        const pagination = assignPagination(
+          data.getCustomersPaginationByMonth.totalSearchData,
+          perPage,
+        )
+        setTotalData(data.getCustomersPaginationByMonth.totalSearchData)
+        setTotalPage(pagination.countArray)
+        setTotalPaginate(pagination.totalPaginate)
+      }
+      setCustomerList(data.getCustomersPaginationByMonth.searchData)
+      setIsChangingPage(false)
     },
     onError(err) {
       console.log(err)
     },
     fetchPolicy: 'cache-and-network',
   })
-  const [getTotalCustomerByMonth] = useLazyQuery(GET_TOTAL_CUSTOMERS_BY_MONTH, {
-    onCompleted: (data) => {
-      const count = Math.ceil(data.getTotalCustomersPaginationByMonth / perPage)
-      const countArray = []
-      for (let i = 1; i <= count; i++) {
-        if (i <= 3) {
-          countArray.push({ i, hidden: false })
-        } else {
-          countArray.push({ i, hidden: true })
-        }
-      }
-      setTotalData(data.getTotalCustomersPaginationByMonth)
-      setTotalPage(countArray)
-    },
-  })
   const [searchCustomer] = useLazyQuery(SEARCH_CUSTOMER, {
     onCompleted: (data) => {
-      const count = Math.ceil(data.searchCustomer.totalSearchData / perPage)
-      const countArray = []
-      for (let i = 1; i <= count; i++) {
-        if (i <= 3) {
-          countArray.push({ i, hidden: false })
-        } else {
-          countArray.push({ i, hidden: true })
-        }
-      }
-      if (!isLaquo) {
+      if (!isChangingPage) {
+        const pagination = assignPagination(data.searchCustomer.totalSearchData, perPage)
         setTotalData(data.searchCustomer.totalSearchData)
-        setTotalPage(countArray)
+        setTotalPage(pagination.countArray)
+        setTotalPaginate(pagination.totalPaginate)
       }
       setCustomerList(data.searchCustomer.searchData)
+      setIsChangingPage(false)
     },
     onError(err) {
       console.log(err)
@@ -183,20 +170,14 @@ const CustomersList = () => {
   })
   const [searchInvoice] = useLazyQuery(SEARCH_INVOICE, {
     onCompleted: (data) => {
-      const count = Math.ceil(data.searchInvoice.totalSearchData / perPage)
-      const countArray = []
-      for (let i = 1; i <= count; i++) {
-        if (i <= 3) {
-          countArray.push({ i, hidden: false })
-        } else {
-          countArray.push({ i, hidden: true })
-        }
-      }
-      if (!isLaquo) {
+      if (!isChangingPage) {
+        const pagination = assignPagination(data.searchInvoice.totalSearchData, perPage)
         setTotalData(data.searchInvoice.totalSearchData)
-        setTotalPage(countArray)
+        setTotalPage(pagination.countArray)
+        setTotalPaginate(pagination.totalPaginate)
       }
       setCustomerList(data.searchInvoice.searchData)
+      setIsChangingPage(false)
     },
     onError(err) {
       console.log(err)
@@ -231,19 +212,9 @@ const CustomersList = () => {
           },
         },
       })
-      if (!isLaquo) {
-        getTotalCustomerByMonth({
-          variables: {
-            input: {
-              this_month: monthStart,
-            },
-          },
-        })
-      }
     }
-    setIsLaquo(false)
     // eslint-disable-next-line
-  }, [currentPage])
+  }, [perPage, currentPage])
 
   const capitalizeString = (string) => {
     const changeUnderscore = string.replace(/_/g, ' ')
@@ -252,26 +223,7 @@ const CustomersList = () => {
   const invoiceListHandler = (data) => {
     navigate('/customers/list/invoices', { state: data })
   }
-  const laquoHandler = (direction) => {
-    setIsLaquo(true)
-    if (direction === 'left' && currentPage > 1) {
-      setActivePage(currentPage - 1)
-      const newPage = [...totalPage]
-      if (currentPage + 2 <= totalPage.length) {
-        newPage[currentPage + 1].hidden = true
-        newPage[currentPage - 2].hidden = false
-      }
-      setTotalPage(newPage)
-    } else if (direction === 'right' && currentPage < totalPage.length) {
-      const newPage = [...totalPage]
-      if (totalPage.length - currentPage > 0 && currentPage > 2) {
-        newPage[currentPage - 3].hidden = true
-        newPage[currentPage].hidden = false
-      }
-      setTotalPage(newPage)
-      setActivePage(currentPage + 1)
-    }
-  }
+
   const onChange = (e) => {
     setSearchValues({
       ...searchValues,
@@ -286,7 +238,7 @@ const CustomersList = () => {
   }
   const onSubmit = async (e) => {
     e.preventDefault()
-    setActivePage(1)
+    setCurrentPage(1)
     setIsSearching(true)
 
     if (isInvoiceSearching) {
@@ -356,7 +308,7 @@ const CustomersList = () => {
   const resetSearch = async (e) => {
     e.preventDefault()
     const monthStart = date.toISOString().slice(0, 7)
-    setActivePage(1)
+    setCurrentPage(1)
     setIsSearching(false)
 
     Array.from(document.querySelectorAll('input')).forEach((input) => (input.value = ''))
@@ -368,15 +320,8 @@ const CustomersList = () => {
         variables: {
           input: {
             this_month: monthStart,
-            page: currentPage,
+            page: 1,
             perPage: perPage,
-          },
-        },
-      })
-      await getTotalCustomerByMonth({
-        variables: {
-          input: {
-            this_month: monthStart,
           },
         },
       })
@@ -601,6 +546,11 @@ const CustomersList = () => {
               {customerList && <div className="mt-2 float-end">Total data: {totalData}</div>}
             </CCol>
           </CRow>
+          <ItemsPerPageComponent
+            perPage={perPage}
+            setPerPage={setPerPage}
+            setCurrentPage={setCurrentPage}
+          />
           <CTable>
             <CTableHead>
               <CTableRow>
@@ -649,32 +599,16 @@ const CustomersList = () => {
             <div className="text-center text-danger">Belum ada data</div>
           )}
         </CCardBody>
-        <CCardFooter className="d-flex justify-content-center align-item-center">
-          {totalPage && (
-            <CPagination>
-              <CPaginationItem onClick={() => laquoHandler('left')} disabled={currentPage === 1}>
-                Previous
-              </CPaginationItem>
-              {totalPage.map((item, idx) => (
-                <CPaginationItem
-                  key={idx}
-                  onClick={() => setActivePage(idx + 1)}
-                  active={currentPage === idx + 1}
-                  hidden={item.hidden}
-                >
-                  {idx + 1}
-                </CPaginationItem>
-              ))}
-              <CPaginationItem
-                onClick={() => laquoHandler('right')}
-                disabled={currentPage === totalPage.length}
-              >
-                Next
-              </CPaginationItem>
-            </CPagination>
-          )}
-        </CCardFooter>
-        <ToastContainer />
+        {totalPage && (
+          <PaginationComponent
+            currentPage={currentPage}
+            totalPage={totalPage}
+            setCurrentPage={setCurrentPage}
+            setTotalPage={setTotalPage}
+            setIsChangingPage={setIsChangingPage}
+            totalPaginate={totalPaginate}
+          />
+        )}
       </CCard>
     </>
   )
