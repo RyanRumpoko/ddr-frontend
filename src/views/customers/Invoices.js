@@ -18,7 +18,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import AddInvoiceModal from './AddInvoiceModal'
 import InvoiceStatusModal from './InvoiceStatusModal'
 import AddInvoiceBeforeModal from './AddInvoiceBeforeModal'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { AuthContext } from 'src/context/auth'
 import moment from 'moment'
@@ -299,7 +299,6 @@ const Invoices = () => {
               setRefreshTrigger={setRefreshTrigger}
             />
           )}
-          <ToastContainer />
         </CCard>
       </CCol>
     </CRow>

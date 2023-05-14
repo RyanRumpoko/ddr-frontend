@@ -4,7 +4,6 @@ import {
   CCard,
   CCardBody,
   CCardHeader,
-  CCardFooter,
   CCol,
   CRow,
   CTable,
@@ -13,62 +12,57 @@ import {
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CPagination,
-  CPaginationItem,
 } from '@coreui/react'
-import { useQuery, useLazyQuery, gql } from '@apollo/client'
+import { useLazyQuery, gql } from '@apollo/client'
 import AddSettingServiceModal from './AddSettingServiceModal'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
+import { assignPagination } from 'src/util/Pagination'
+import PaginationComponent from '../components/PaginationComponent'
+import ItemsPerPageComponent from '../components/ItemsPerPageComponent'
 
 const GET_ALL_SETTING_SERVICE_PAGINATION = gql`
   query GetAllSettingServicePagination($input: GetSettingServicePagination) {
     getAllSettingServicePagination(input: $input) {
-      _id
-      service_name
-      base_price
-      is_active
+      totalSearchData
+      searchData {
+        _id
+        service_name
+        base_price
+        is_active
+      }
     }
-  }
-`
-
-const GET_TOTAL_SETTING_SERVICE = gql`
-  query GetTotalSettingService {
-    getTotalAllSettingService
   }
 `
 
 const SettingService = () => {
   const [settingServiceList, setSettingServiceList] = useState([])
-  const [currentPage, setActivePage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
   const [totalPage, setTotalPage] = useState()
-  const [perPage] = useState(25)
+  const [perPage, setPerPage] = useState(25)
   const [settingServiceModal, setSettingServiceModal] = useState(false)
   const [refreshTrigger, setRefreshTrigger] = useState(false)
   const [totalData, setTotalData] = useState(0)
+  const [isChangingPage, setIsChangingPage] = useState(false)
+  const [totalPaginate, setTotalPaginate] = useState(0)
 
   const [getAllSetting, { loading }] = useLazyQuery(GET_ALL_SETTING_SERVICE_PAGINATION, {
     onCompleted: (data) => {
-      setSettingServiceList(data.getAllSettingServicePagination)
+      if (!isChangingPage) {
+        const pagination = assignPagination(
+          data.getAllSettingServicePagination.totalSearchData,
+          perPage,
+        )
+        setTotalData(data.getAllSettingServicePagination.totalSearchData)
+        setTotalPage(pagination.countArray)
+        setTotalPaginate(pagination.totalPaginate)
+      }
+      setSettingServiceList(data.getAllSettingServicePagination.searchData)
+      setIsChangingPage(false)
     },
     onError(err) {
       console.log(err)
     },
     fetchPolicy: 'cache-and-network',
-  })
-  useQuery(GET_TOTAL_SETTING_SERVICE, {
-    onCompleted: (data) => {
-      const count = Math.ceil(data.getTotalAllSettingService / perPage)
-      const countArray = []
-      for (let i = 1; i <= count; i++) {
-        if (i <= 3) {
-          countArray.push({ i, hidden: false })
-        } else {
-          countArray.push({ i, hidden: true })
-        }
-      }
-      setTotalData(data.getTotalAllSettingService)
-      setTotalPage(countArray)
-    },
   })
 
   useEffect(() => {
@@ -81,7 +75,7 @@ const SettingService = () => {
       },
     })
     // eslint-disable-next-line
-  }, [currentPage])
+  }, [currentPage, perPage])
 
   const capitalizeString = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1)
@@ -91,25 +85,6 @@ const SettingService = () => {
   }
   const addNewSettingService = () => {
     setSettingServiceModal(!settingServiceModal)
-  }
-  const laquoHandler = (direction) => {
-    if (direction === 'left' && currentPage > 1) {
-      setActivePage(currentPage - 1)
-      const newPage = [...totalPage]
-      if (currentPage + 2 <= totalPage.length) {
-        newPage[currentPage + 1].hidden = true
-        newPage[currentPage - 2].hidden = false
-      }
-      setTotalPage(newPage)
-    } else if (direction === 'right' && currentPage < totalPage.length) {
-      const newPage = [...totalPage]
-      if (totalPage.length - currentPage > 0 && currentPage > 2) {
-        newPage[currentPage - 3].hidden = true
-        newPage[currentPage].hidden = false
-      }
-      setTotalPage(newPage)
-      setActivePage(currentPage + 1)
-    }
   }
 
   if (refreshTrigger) {
@@ -142,6 +117,11 @@ const SettingService = () => {
             {settingServiceList && <div className="mt-2 float-end">Total data: {totalData}</div>}
           </CCol>
         </CRow>
+        <ItemsPerPageComponent
+          perPage={perPage}
+          setPerPage={setPerPage}
+          setCurrentPage={setCurrentPage}
+        />
         <CTable>
           <CTableHead>
             <CTableRow>
@@ -172,31 +152,16 @@ const SettingService = () => {
           <div className="text-center text-danger">Belum ada data</div>
         )}
       </CCardBody>
-      <CCardFooter className="d-flex justify-content-center align-item-center">
-        {totalPage && (
-          <CPagination>
-            <CPaginationItem onClick={() => laquoHandler('left')} disabled={currentPage === 1}>
-              Previous
-            </CPaginationItem>
-            {totalPage.map((item, idx) => (
-              <CPaginationItem
-                key={idx}
-                onClick={() => setActivePage(idx + 1)}
-                active={currentPage === idx + 1}
-                hidden={item.hidden}
-              >
-                {idx + 1}
-              </CPaginationItem>
-            ))}
-            <CPaginationItem
-              onClick={() => laquoHandler('right')}
-              disabled={currentPage === totalPage.length}
-            >
-              Next
-            </CPaginationItem>
-          </CPagination>
-        )}
-      </CCardFooter>
+      {totalPage && (
+        <PaginationComponent
+          currentPage={currentPage}
+          totalPage={totalPage}
+          setCurrentPage={setCurrentPage}
+          setTotalPage={setTotalPage}
+          setIsChangingPage={setIsChangingPage}
+          totalPaginate={totalPaginate}
+        />
+      )}
       {settingServiceModal && (
         <AddSettingServiceModal
           settingServiceModal={settingServiceModal}
@@ -204,7 +169,6 @@ const SettingService = () => {
           setRefreshTrigger={setRefreshTrigger}
         />
       )}
-      <ToastContainer />
     </CCard>
   )
 }

@@ -12,7 +12,7 @@ import {
 } from '@coreui/react'
 import { gql, useMutation, useQuery } from '@apollo/client'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { toast, ToastContainer } from 'react-toastify'
+import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const UPDATE_CUSTOMER = gql`
@@ -281,7 +281,6 @@ const EditCustomer = () => {
           </CForm>
         )}
       </CCardBody>
-      <ToastContainer />
     </CCard>
   )
 }
