@@ -220,7 +220,6 @@ const CustomersList = () => {
   useEffect(() => {
     const monthStart = date.toISOString().slice(0, 7)
     if (isInvoiceSearching && isSearching) {
-      console.log('Masuk 1')
       searchInvoice({
         variables: {
           input: {
@@ -232,12 +231,10 @@ const CustomersList = () => {
         },
       })
     } else if (isSearching) {
-      console.log('Masuk 2')
       searchCustomer({
         variables: { input: { ...searchValues, page: currentPage, perPage: perPage } },
       })
     } else if (!urlQuery.get('invoice')) {
-      console.log('Masuk 3')
       getCustomerByMonth({
         variables: {
           input: {
