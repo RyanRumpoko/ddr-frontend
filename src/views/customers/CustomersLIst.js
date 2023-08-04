@@ -17,11 +17,12 @@ import {
   CTableDataCell,
 } from '@coreui/react'
 import { useQuery, useLazyQuery, gql } from '@apollo/client'
-import { useNavigate } from 'react-router-dom'
+import { createSearchParams, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import { assignPagination } from 'src/util/Pagination'
 import PaginationComponent from '../components/PaginationComponent'
 import ItemsPerPageComponent from '../components/ItemsPerPageComponent'
+import { useQueryURL } from 'src/util/useQueryURL'
 
 const GET_CUSTOMERS_PAGINATION_BY_MONTH = gql`
   query GetCustomersPaginationByMonth($input: GetCustomersPaginationByMonthInput) {
@@ -122,6 +123,7 @@ const CustomersList = () => {
   const [totalPaginate, setTotalPaginate] = useState(0)
 
   let navigate = useNavigate()
+  const urlQuery = useQueryURL()
   const date = new Date()
 
   const [getCustomerByMonth, { loading }] = useLazyQuery(GET_CUSTOMERS_PAGINATION_BY_MONTH, {
@@ -186,6 +188,36 @@ const CustomersList = () => {
   })
 
   useEffect(() => {
+    if (urlQuery.get('invoice') === 'false') {
+      const querySearch = {
+        name: urlQuery.get('name'),
+        phone_number: urlQuery.get('phone_number'),
+        brand: urlQuery.get('brand'),
+        type: urlQuery.get('type'),
+        plate_number: urlQuery.get('plate_number'),
+        color: urlQuery.get('color'),
+        transmission: urlQuery.get('transmission'),
+        year: urlQuery.get('year'),
+      }
+      setIsInvoiceSearching(false)
+      setSearchValues({ ...querySearch })
+      submitSearch(querySearch)
+    } else if (urlQuery.get('invoice') === 'true') {
+      const queryInvoice = {
+        estimated_date_min: urlQuery.get('estimated_date_min'),
+        estimated_date_max: urlQuery.get('estimated_date_max'),
+        ongoing_date_min: urlQuery.get('ongoing_date_min'),
+        ongoing_date_max: urlQuery.get('ongoing_date_max'),
+        invoice_number: urlQuery.get('invoice_number'),
+        total_invoice: urlQuery.get('total_invoice'),
+      }
+      setIsInvoiceSearching(true)
+      setSearchInvoiceValues(queryInvoice)
+      submitInvoice(queryInvoice)
+    }
+    // eslint-disable-next-line
+  }, [])
+  useEffect(() => {
     const monthStart = date.toISOString().slice(0, 7)
     if (isInvoiceSearching && isSearching) {
       searchInvoice({
@@ -221,6 +253,8 @@ const CustomersList = () => {
     return changeUnderscore.charAt(0).toUpperCase() + changeUnderscore.slice(1)
   }
   const invoiceListHandler = (data) => {
+    // const win = window.open(`/customers/list/invoices`, '_blank')
+    // win.focus()
     navigate('/customers/list/invoices', { state: data })
   }
 
@@ -236,12 +270,32 @@ const CustomersList = () => {
       [e.target.name]: e.target.value,
     })
   }
+  const submitInvoice = async (data) => {
+    await searchInvoice({
+      variables: {
+        input: {
+          ...data,
+          page: currentPage,
+          perPage: perPage,
+          total_invoice: Number(searchInvoiceValues.total_invoice),
+        },
+      },
+    })
+  }
+  const submitSearch = async (data) => {
+    await searchCustomer({
+      variables: { input: { ...data, page: currentPage, perPage: perPage } },
+    })
+  }
   const onSubmit = async (e) => {
     e.preventDefault()
     setCurrentPage(1)
     setIsSearching(true)
 
     if (isInvoiceSearching) {
+      navigate({
+        search: `?${createSearchParams({ ...searchInvoiceValues, invoice: true })}`,
+      })
       let inputCheck = 0
       for (const el in searchInvoiceValues) {
         if (searchInvoiceValues[el]) {
@@ -290,6 +344,9 @@ const CustomersList = () => {
         },
       })
     } else {
+      navigate({
+        search: `?${createSearchParams({ ...searchValues, invoice: false })}`,
+      })
       let inputCheck = 0
       for (const el in searchValues) {
         if (searchValues[el]) {
