@@ -234,7 +234,7 @@ const CustomersList = () => {
       searchCustomer({
         variables: { input: { ...searchValues, page: currentPage, perPage: perPage } },
       })
-    } else {
+    } else if (!urlQuery.get('invoice')) {
       getCustomerByMonth({
         variables: {
           input: {
@@ -365,6 +365,9 @@ const CustomersList = () => {
   const resetSearch = async (e) => {
     e.preventDefault()
     const monthStart = date.toISOString().slice(0, 7)
+    navigate({
+      search: '',
+    })
     setCurrentPage(1)
     setIsSearching(false)
 
