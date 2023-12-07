@@ -199,9 +199,12 @@ const CustomersList = () => {
         transmission: urlQuery.get('transmission'),
         year: urlQuery.get('year'),
       }
+      setIsSearching(true)
       setIsInvoiceSearching(false)
       setSearchValues({ ...querySearch })
       submitSearch(querySearch)
+      setCurrentPage(parseInt(urlQuery.get('page')))
+      setPerPage(parseInt(urlQuery.get('perPage')))
     } else if (urlQuery.get('invoice') === 'true') {
       const queryInvoice = {
         estimated_date_min: urlQuery.get('estimated_date_min'),
@@ -211,9 +214,12 @@ const CustomersList = () => {
         invoice_number: urlQuery.get('invoice_number'),
         total_invoice: urlQuery.get('total_invoice'),
       }
+      setIsSearching(true)
       setIsInvoiceSearching(true)
       setSearchInvoiceValues(queryInvoice)
       submitInvoice(queryInvoice)
+      setCurrentPage(parseInt(urlQuery.get('page')))
+      setPerPage(parseInt(urlQuery.get('perPage')))
     }
     // eslint-disable-next-line
   }, [])
@@ -230,9 +236,25 @@ const CustomersList = () => {
           },
         },
       })
+      navigate({
+        search: `?${createSearchParams({
+          ...searchInvoiceValues,
+          invoice: true,
+          page: currentPage,
+          perPage: perPage,
+        })}`,
+      })
     } else if (isSearching) {
       searchCustomer({
         variables: { input: { ...searchValues, page: currentPage, perPage: perPage } },
+      })
+      navigate({
+        search: `?${createSearchParams({
+          ...searchValues,
+          invoice: false,
+          page: currentPage,
+          perPage: perPage,
+        })}`,
       })
     } else if (!urlQuery.get('invoice')) {
       getCustomerByMonth({
@@ -294,7 +316,12 @@ const CustomersList = () => {
 
     if (isInvoiceSearching) {
       navigate({
-        search: `?${createSearchParams({ ...searchInvoiceValues, invoice: true })}`,
+        search: `?${createSearchParams({
+          ...searchInvoiceValues,
+          invoice: true,
+          page: currentPage,
+          perPage: perPage,
+        })}`,
       })
       let inputCheck = 0
       for (const el in searchInvoiceValues) {
@@ -345,7 +372,12 @@ const CustomersList = () => {
       })
     } else {
       navigate({
-        search: `?${createSearchParams({ ...searchValues, invoice: false })}`,
+        search: `?${createSearchParams({
+          ...searchValues,
+          invoice: false,
+          page: currentPage,
+          perPage: perPage,
+        })}`,
       })
       let inputCheck = 0
       for (const el in searchValues) {
@@ -627,7 +659,7 @@ const CustomersList = () => {
                 customerList &&
                 customerList.length !== 0 &&
                 customerList.map((item, idx) => (
-                  <CTableRow key={item._id}>
+                  <CTableRow key={`${item._id}${idx}`}>
                     <CTableHeaderCell scope="row">
                       {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
                     </CTableHeaderCell>
