@@ -26,6 +26,7 @@ const GET_ALL_SETTING_SERVICE = gql`
     getAllSettingService {
       _id
       service_name
+      service_type
       base_price
     }
   }
@@ -41,6 +42,7 @@ const AddServiceModal = ({
 }) => {
   const [values, setValues] = useState({
     service_name: '',
+    service_type: '',
     quantity: 0,
     price: 0,
     total: 0,
@@ -132,7 +134,13 @@ const AddServiceModal = ({
       try {
         await addService({
           variables: {
-            input: { ...values, service_name: getServiceId._id, invoice_id, is_disc: isDisc },
+            input: {
+              ...values,
+              service_name: getServiceId._id,
+              service_type: getServiceId.service_type,
+              invoice_id,
+              is_disc: isDisc,
+            },
           },
         })
         setRefreshTrigger(true)

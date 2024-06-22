@@ -28,6 +28,7 @@ const GET_ALL_SETTING_SERVICE = gql`
     getAllSettingService {
       _id
       service_name
+      service_type
       base_price
     }
   }
@@ -118,6 +119,8 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
   const onSubmit = async (e) => {
     e.preventDefault()
     let total_invoice = 0
+    let total_service = 0
+    let total_non_service = 0
     const newArrayInput = arrayInput.map((el) => {
       if (el.service_name.toLocaleLowerCase() === 'discount') total_invoice -= el.total
       else total_invoice += el.total
@@ -125,6 +128,19 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
       const getServiceId = settingServiceList.find(
         (item) => item.service_name === el.service_name.toLocaleLowerCase(),
       )
+
+      if (
+        el.service_name.toLocaleLowerCase() !== 'discount' &&
+        getServiceId.service_type === 'service'
+      ) {
+        total_service += el.total
+      } else if (
+        el.service_name.toLocaleLowerCase() !== 'discount' &&
+        getServiceId.service_type === 'non-service'
+      ) {
+        total_non_service += el.total
+      }
+
       if (!getServiceId) {
         return errors.push(
           toast.error(`Nama setting "${el.service_name.toLocaleLowerCase()}" belum terdaftar`),
@@ -137,7 +153,13 @@ const AddInvoiceModal = ({ invoiceModal, setInvoiceModal, id, setRefreshTrigger 
       try {
         await addNewInvoice({
           variables: {
-            input: { ...values, service_bulk: newArrayInput, total_invoice },
+            input: {
+              ...values,
+              service_bulk: newArrayInput,
+              total_invoice,
+              total_service,
+              total_non_service,
+            },
           },
         })
         setRefreshTrigger(true)
