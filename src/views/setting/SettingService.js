@@ -122,32 +122,34 @@ const SettingService = () => {
           setPerPage={setPerPage}
           setCurrentPage={setCurrentPage}
         />
-        <CTable>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell scope="col">#</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Nama Service</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Harga Dasar</CTableHeaderCell>
-              <CTableHeaderCell scope="col">isActive</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {!loading &&
-              settingServiceList &&
-              settingServiceList.length !== 0 &&
-              settingServiceList.map((item, idx) => (
-                <CTableRow key={item._id}>
-                  <CTableHeaderCell scope="row">
-                    {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{capitalizeString(item.service_name)}</CTableDataCell>
-                  <CTableDataCell>{localString(item.base_price)}</CTableDataCell>
-                  <CTableDataCell>{item.is_active ? 'Yes' : 'No'}</CTableDataCell>
-                </CTableRow>
-              ))}
-          </CTableBody>
-        </CTable>
+        <div className="table-responsive">
+          <CTable>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Nama Service</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Harga Dasar</CTableHeaderCell>
+                <CTableHeaderCell scope="col">isActive</CTableHeaderCell>
+                <CTableHeaderCell scope="col"></CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {!loading &&
+                settingServiceList &&
+                settingServiceList.length !== 0 &&
+                settingServiceList.map((item, idx) => (
+                  <CTableRow key={item._id}>
+                    <CTableHeaderCell scope="row">
+                      {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
+                    </CTableHeaderCell>
+                    <CTableDataCell>{capitalizeString(item.service_name)}</CTableDataCell>
+                    <CTableDataCell>{localString(item.base_price)}</CTableDataCell>
+                    <CTableDataCell>{item.is_active ? 'Yes' : 'No'}</CTableDataCell>
+                  </CTableRow>
+                ))}
+            </CTableBody>
+          </CTable>
+        </div>
         {!loading && settingServiceList.length === 0 && (
           <div className="text-center text-danger">Belum ada data</div>
         )}

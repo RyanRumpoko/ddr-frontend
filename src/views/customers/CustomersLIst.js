@@ -643,50 +643,52 @@ const CustomersList = () => {
             setPerPage={setPerPage}
             setCurrentPage={setCurrentPage}
           />
-          <CTable>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Nama</CTableHeaderCell>
-                <CTableHeaderCell scope="col">No Telepon</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Jenis Kendaraan</CTableHeaderCell>
-                <CTableHeaderCell scope="col">No Polisi</CTableHeaderCell>
-                <CTableHeaderCell scope="col"></CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {!loading &&
-                customerList &&
-                customerList.length !== 0 &&
-                customerList.map((item, idx) => (
-                  <CTableRow key={`${item._id}${idx}`}>
-                    <CTableHeaderCell scope="row">
-                      {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
-                    </CTableHeaderCell>
-                    <CTableDataCell>{capitalizeString(item.name)}</CTableDataCell>
-                    <CTableDataCell>{`0${item.phone_number}`}</CTableDataCell>
-                    <CTableDataCell>
-                      {capitalizeString(item.brand)} {capitalizeString(item.type)}
-                    </CTableDataCell>
-                    <CTableDataCell>{item.plate_number.toUpperCase()}</CTableDataCell>
-                    <CTableDataCell>
-                      <CButton
-                        color="primary"
-                        variant="outline"
-                        shape="square"
-                        size="sm"
-                        className="mr-1"
-                        onClick={() => {
-                          invoiceListHandler(item)
-                        }}
-                      >
-                        Detail
-                      </CButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
-            </CTableBody>
-          </CTable>
+          <div className="table-responsive">
+            <CTable>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Nama</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">No Telepon</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Jenis Kendaraan</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">No Polisi</CTableHeaderCell>
+                  <CTableHeaderCell scope="col"></CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {!loading &&
+                  customerList &&
+                  customerList.length !== 0 &&
+                  customerList.map((item, idx) => (
+                    <CTableRow key={`${item._id}${idx}`}>
+                      <CTableHeaderCell scope="row">
+                        {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
+                      </CTableHeaderCell>
+                      <CTableDataCell>{capitalizeString(item.name)}</CTableDataCell>
+                      <CTableDataCell>{`0${item.phone_number}`}</CTableDataCell>
+                      <CTableDataCell>
+                        {capitalizeString(item.brand)} {capitalizeString(item.type)}
+                      </CTableDataCell>
+                      <CTableDataCell>{item.plate_number.toUpperCase()}</CTableDataCell>
+                      <CTableDataCell>
+                        <CButton
+                          color="primary"
+                          variant="outline"
+                          shape="square"
+                          size="sm"
+                          className="mr-1"
+                          onClick={() => {
+                            invoiceListHandler(item)
+                          }}
+                        >
+                          Detail
+                        </CButton>
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))}
+              </CTableBody>
+            </CTable>
+          </div>
           {!loading && customerList.length === 0 && (
             <div className="text-center text-danger">Belum ada data</div>
           )}

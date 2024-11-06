@@ -239,62 +239,64 @@ const Invoices = () => {
                 )}
               </CCol>
             </CRow>
-            <CTable>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Tgl Invoice</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Tgl Selesai</CTableHeaderCell>
-                  <CTableHeaderCell scope="col"></CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {!loading &&
-                  invoiceList &&
-                  invoiceList.length !== 0 &&
-                  invoiceList.map((item, idx) => (
-                    <CTableRow key={item._id}>
-                      <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                      <CTableDataCell>{item.invoice_number}</CTableDataCell>
-                      <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
-                      <CTableDataCell>
-                        {moment(item.estimated_date).format('D MMM YYYY')}
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        {item.ongoing_date ? moment(item.ongoing_date).format('D MMM YYYY') : '-'}
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <CButton
-                          color="warning"
-                          variant="outline"
-                          shape="square"
-                          size="sm"
-                          className="me-1 mb-1"
-                          onClick={() => {
-                            changeStatusHandler(item)
-                          }}
-                        >
-                          Ganti Status
-                        </CButton>
-                        <CButton
-                          color="primary"
-                          variant="outline"
-                          shape="square"
-                          size="sm"
-                          className="mb-1"
-                          onClick={() => {
-                            invoiceDetailHandler(item)
-                          }}
-                        >
-                          Detail
-                        </CButton>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-              </CTableBody>
-            </CTable>
+            <div className="table-responsive">
+              <CTable>
+                <CTableHead>
+                  <CTableRow>
+                    <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Tgl Invoice</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Tgl Selesai</CTableHeaderCell>
+                    <CTableHeaderCell scope="col"></CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {!loading &&
+                    invoiceList &&
+                    invoiceList.length !== 0 &&
+                    invoiceList.map((item, idx) => (
+                      <CTableRow key={item._id}>
+                        <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                        <CTableDataCell>{item.invoice_number}</CTableDataCell>
+                        <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
+                        <CTableDataCell>
+                          {moment(item.estimated_date).format('D MMM YYYY')}
+                        </CTableDataCell>
+                        <CTableDataCell>
+                          {item.ongoing_date ? moment(item.ongoing_date).format('D MMM YYYY') : '-'}
+                        </CTableDataCell>
+                        <CTableDataCell>
+                          <CButton
+                            color="warning"
+                            variant="outline"
+                            shape="square"
+                            size="sm"
+                            className="me-1 mb-1"
+                            onClick={() => {
+                              changeStatusHandler(item)
+                            }}
+                          >
+                            Ganti Status
+                          </CButton>
+                          <CButton
+                            color="primary"
+                            variant="outline"
+                            shape="square"
+                            size="sm"
+                            className="mb-1"
+                            onClick={() => {
+                              invoiceDetailHandler(item)
+                            }}
+                          >
+                            Detail
+                          </CButton>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))}
+                </CTableBody>
+              </CTable>
+            </div>
             {!loading && invoiceList.length === 0 && (
               <div className="text-center text-danger">Belum ada data</div>
             )}
