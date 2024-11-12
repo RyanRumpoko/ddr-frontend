@@ -119,30 +119,32 @@ const SettingBrand = () => {
           setPerPage={setPerPage}
           setCurrentPage={setCurrentPage}
         />
-        <CTable>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell scope="col">#</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Nama Brand</CTableHeaderCell>
-              <CTableHeaderCell scope="col">isActive</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {!loading &&
-              settingBrandList &&
-              settingBrandList.length !== 0 &&
-              settingBrandList.map((item, idx) => (
-                <CTableRow key={item._id}>
-                  <CTableHeaderCell scope="row">
-                    {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
-                  </CTableHeaderCell>
-                  <CTableDataCell>{capitalizeString(item.brand_name)}</CTableDataCell>
-                  <CTableDataCell>{item.is_active ? 'Yes' : 'No'}</CTableDataCell>
-                </CTableRow>
-              ))}
-          </CTableBody>
-        </CTable>
+        <div className="table-responsive">
+          <CTable>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Nama Brand</CTableHeaderCell>
+                <CTableHeaderCell scope="col">isActive</CTableHeaderCell>
+                <CTableHeaderCell scope="col"></CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {!loading &&
+                settingBrandList &&
+                settingBrandList.length !== 0 &&
+                settingBrandList.map((item, idx) => (
+                  <CTableRow key={item._id}>
+                    <CTableHeaderCell scope="row">
+                      {currentPage === 1 ? idx + 1 : (currentPage - 1) * perPage + idx + 1}
+                    </CTableHeaderCell>
+                    <CTableDataCell>{capitalizeString(item.brand_name)}</CTableDataCell>
+                    <CTableDataCell>{item.is_active ? 'Yes' : 'No'}</CTableDataCell>
+                  </CTableRow>
+                ))}
+            </CTableBody>
+          </CTable>
+        </div>
         {!loading && settingBrandList.length === 0 && (
           <div className="text-center text-danger">Belum ada data</div>
         )}

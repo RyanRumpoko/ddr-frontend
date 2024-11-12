@@ -292,37 +292,71 @@ const InvoiceDetail = () => {
             {serviceList && <div className="mt-2 float-end">Total data: {serviceList.length}</div>}
           </CCol>
         </CRow>
-        <CTable>
-          <CTableHead>
-            <CTableRow>
-              <CTableHeaderCell scope="col">#</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Nama Barang</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Jumlah</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Harga</CTableHeaderCell>
-              <CTableHeaderCell scope="col">Total</CTableHeaderCell>
-              <CTableHeaderCell scope="col"></CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {!loading &&
-              serviceList &&
-              serviceList.length !== 0 &&
-              serviceList.map((item, idx) => (
-                <CTableRow key={item._id}>
-                  <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                  <CTableDataCell>
-                    {capitalizeString(item.service_name.service_name)}
-                  </CTableDataCell>
-                  <CTableDataCell>{item.quantity}</CTableDataCell>
-                  <CTableDataCell>{localString(item.price)}</CTableDataCell>
-                  <CTableDataCell>{localString(item.total)}</CTableDataCell>
-                  <CTableDataCell>
+        <div className="table-responsive">
+          <CTable>
+            <CTableHead>
+              <CTableRow>
+                <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Nama Barang</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Jumlah</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Harga</CTableHeaderCell>
+                <CTableHeaderCell scope="col">Total</CTableHeaderCell>
+                <CTableHeaderCell scope="col"></CTableHeaderCell>
+              </CTableRow>
+            </CTableHead>
+            <CTableBody>
+              {!loading &&
+                serviceList &&
+                serviceList.length !== 0 &&
+                serviceList.map((item, idx) => (
+                  <CTableRow key={item._id}>
+                    <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                    <CTableDataCell>
+                      {capitalizeString(item.service_name.service_name)}
+                    </CTableDataCell>
+                    <CTableDataCell>{item.quantity}</CTableDataCell>
+                    <CTableDataCell>{localString(item.price)}</CTableDataCell>
+                    <CTableDataCell>{localString(item.total)}</CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        size="sm"
+                        hidden={editMode}
+                        color="warning"
+                        className="text-white me-1 mb-1"
+                        onClick={() => editHandler(item)}
+                      >
+                        Edit
+                      </CButton>
+                      <CButton
+                        size="sm"
+                        hidden={editMode}
+                        color="danger"
+                        className="text-white mb-1"
+                        onClick={() => deleteHandler(item)}
+                      >
+                        Hapus
+                      </CButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+            </CTableBody>
+            <CTableHead>
+              <CTableRow>
+                <CTableDataCell colSpan={5} />
+                <CTableDataCell colSpan={2} />
+              </CTableRow>
+              {!loading && dataDisc && (
+                <CTableRow>
+                  <CTableDataCell colSpan={3} />
+                  <CTableDataCell color="danger">Discount</CTableDataCell>
+                  <CTableDataCell color="danger">{localString(dataDisc.total)}</CTableDataCell>
+                  <CTableDataCell color="danger">
                     <CButton
                       size="sm"
                       hidden={editMode}
                       color="warning"
                       className="text-white me-1 mb-1"
-                      onClick={() => editHandler(item)}
+                      onClick={() => editHandler({ _id: 'discount' })}
                     >
                       Edit
                     </CButton>
@@ -331,54 +365,22 @@ const InvoiceDetail = () => {
                       hidden={editMode}
                       color="danger"
                       className="text-white mb-1"
-                      onClick={() => deleteHandler(item)}
+                      onClick={() => deleteHandler({ _id: 'discount' })}
                     >
                       Hapus
                     </CButton>
                   </CTableDataCell>
                 </CTableRow>
-              ))}
-          </CTableBody>
-          <CTableHead>
-            <CTableRow>
-              <CTableDataCell colSpan={5} />
-              <CTableDataCell colSpan={2} />
-            </CTableRow>
-            {!loading && dataDisc && (
+              )}
               <CTableRow>
                 <CTableDataCell colSpan={3} />
-                <CTableDataCell color="danger">Discount</CTableDataCell>
-                <CTableDataCell color="danger">{localString(dataDisc.total)}</CTableDataCell>
-                <CTableDataCell color="danger">
-                  <CButton
-                    size="sm"
-                    hidden={editMode}
-                    color="warning"
-                    className="text-white me-1 mb-1"
-                    onClick={() => editHandler({ _id: 'discount' })}
-                  >
-                    Edit
-                  </CButton>
-                  <CButton
-                    size="sm"
-                    hidden={editMode}
-                    color="danger"
-                    className="text-white mb-1"
-                    onClick={() => deleteHandler({ _id: 'discount' })}
-                  >
-                    Hapus
-                  </CButton>
-                </CTableDataCell>
+                <CTableDataCell color="success">Total Biaya</CTableDataCell>
+                <CTableDataCell color="success">{localString(invoiceTotal)}</CTableDataCell>
+                <CTableDataCell colSpan={2} color="success" />
               </CTableRow>
-            )}
-            <CTableRow>
-              <CTableDataCell colSpan={3} />
-              <CTableDataCell color="success">Total Biaya</CTableDataCell>
-              <CTableDataCell color="success">{localString(invoiceTotal)}</CTableDataCell>
-              <CTableDataCell colSpan={2} color="success" />
-            </CTableRow>
-          </CTableHead>
-        </CTable>
+            </CTableHead>
+          </CTable>
+        </div>
       </CCardBody>
       <CCardFooter>
         {!loadingCustomer && dataCustomer && (

@@ -85,42 +85,44 @@ const UsersList = () => {
               {userList && <div className="mt-2 float-end">Total data: {userList.length}</div>}
             </CCol>
           </CRow>
-          <CTable>
-            <CTableHead>
-              <CTableRow>
-                <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Nama User</CTableHeaderCell>
-                <CTableHeaderCell scope="col">Role</CTableHeaderCell>
-                <CTableHeaderCell scope="col"></CTableHeaderCell>
-              </CTableRow>
-            </CTableHead>
-            <CTableBody>
-              {!loading &&
-                userList &&
-                userList.length !== 0 &&
-                userList.map((item, idx) => (
-                  <CTableRow key={item._id}>
-                    <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                    <CTableDataCell>{item.username}</CTableDataCell>
-                    <CTableDataCell>{item.role ? getRole(item.role) : '-'}</CTableDataCell>
-                    <CTableDataCell>
-                      <CButton
-                        color="primary"
-                        variant="outline"
-                        shape="square"
-                        size="sm"
-                        className="mr-1"
-                        onClick={() => {
-                          detailHandler(item)
-                        }}
-                      >
-                        Detail
-                      </CButton>
-                    </CTableDataCell>
-                  </CTableRow>
-                ))}
-            </CTableBody>
-          </CTable>
+          <div className="table-responsive">
+            <CTable>
+              <CTableHead>
+                <CTableRow>
+                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Nama User</CTableHeaderCell>
+                  <CTableHeaderCell scope="col">Role</CTableHeaderCell>
+                  <CTableHeaderCell scope="col"></CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {!loading &&
+                  userList &&
+                  userList.length !== 0 &&
+                  userList.map((item, idx) => (
+                    <CTableRow key={item._id}>
+                      <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                      <CTableDataCell>{item.username}</CTableDataCell>
+                      <CTableDataCell>{item.role ? getRole(item.role) : '-'}</CTableDataCell>
+                      <CTableDataCell>
+                        <CButton
+                          color="primary"
+                          variant="outline"
+                          shape="square"
+                          size="sm"
+                          className="mr-1"
+                          onClick={() => {
+                            detailHandler(item)
+                          }}
+                        >
+                          Detail
+                        </CButton>
+                      </CTableDataCell>
+                    </CTableRow>
+                  ))}
+              </CTableBody>
+            </CTable>
+          </div>
           {!loading && userList.length === 0 && <div className="text-center">No Data</div>}
         </CCol>
       </CCardBody>

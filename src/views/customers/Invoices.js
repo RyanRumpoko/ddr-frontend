@@ -107,6 +107,22 @@ const Invoices = () => {
   const editHandler = () => {
     navigate('/customers/list/edit', { state })
   }
+  const whatsappHandler = () => {
+    let win
+    let text = 'Berikut kami lampirkan invoice DDR 126'
+    let changeNumber
+    if (state.phone_number[0] === '0') {
+      changeNumber = '62' + state.phone_number.slice(1)
+    } else if (state.phone_number[0] === '6' && state.phone_number[1] === '2') {
+      changeNumber = state.phone_number
+    } else if (state.phone_number[0] !== '0') {
+      changeNumber = '62' + state.phone_number
+    }
+
+    win = window.open(`https://wa.me/${changeNumber}?text=${text}`, '_blank')
+
+    win.focus()
+  }
   if (refreshTrigger) {
     refetch()
     setRefreshTrigger(false)
@@ -139,6 +155,15 @@ const Invoices = () => {
                   size="sm"
                 >
                   Edit Customer
+                </CButton>
+                <CButton
+                  color="success"
+                  className="float-end"
+                  variant="outline"
+                  size="sm"
+                  onClick={whatsappHandler}
+                >
+                  Whatsapp
                 </CButton>
               </CCol>
             </CRow>
@@ -214,62 +239,64 @@ const Invoices = () => {
                 )}
               </CCol>
             </CRow>
-            <CTable>
-              <CTableHead>
-                <CTableRow>
-                  <CTableHeaderCell scope="col">#</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Status</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Tgl Invoice</CTableHeaderCell>
-                  <CTableHeaderCell scope="col">Tgl Selesai</CTableHeaderCell>
-                  <CTableHeaderCell scope="col"></CTableHeaderCell>
-                </CTableRow>
-              </CTableHead>
-              <CTableBody>
-                {!loading &&
-                  invoiceList &&
-                  invoiceList.length !== 0 &&
-                  invoiceList.map((item, idx) => (
-                    <CTableRow key={item._id}>
-                      <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
-                      <CTableDataCell>{item.invoice_number}</CTableDataCell>
-                      <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
-                      <CTableDataCell>
-                        {moment(item.estimated_date).format('D MMM YYYY')}
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        {item.ongoing_date ? moment(item.ongoing_date).format('D MMM YYYY') : '-'}
-                      </CTableDataCell>
-                      <CTableDataCell>
-                        <CButton
-                          color="warning"
-                          variant="outline"
-                          shape="square"
-                          size="sm"
-                          className="me-1 mb-1"
-                          onClick={() => {
-                            changeStatusHandler(item)
-                          }}
-                        >
-                          Ganti Status
-                        </CButton>
-                        <CButton
-                          color="primary"
-                          variant="outline"
-                          shape="square"
-                          size="sm"
-                          className="mb-1"
-                          onClick={() => {
-                            invoiceDetailHandler(item)
-                          }}
-                        >
-                          Detail
-                        </CButton>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-              </CTableBody>
-            </CTable>
+            <div className="table-responsive">
+              <CTable>
+                <CTableHead>
+                  <CTableRow>
+                    <CTableHeaderCell scope="col">#</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">No Invoice</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Status</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Tgl Invoice</CTableHeaderCell>
+                    <CTableHeaderCell scope="col">Tgl Selesai</CTableHeaderCell>
+                    <CTableHeaderCell scope="col"></CTableHeaderCell>
+                  </CTableRow>
+                </CTableHead>
+                <CTableBody>
+                  {!loading &&
+                    invoiceList &&
+                    invoiceList.length !== 0 &&
+                    invoiceList.map((item, idx) => (
+                      <CTableRow key={item._id}>
+                        <CTableHeaderCell scope="row">{idx + 1}</CTableHeaderCell>
+                        <CTableDataCell>{item.invoice_number}</CTableDataCell>
+                        <CTableDataCell>{getStatus(item.status)}</CTableDataCell>
+                        <CTableDataCell>
+                          {moment(item.estimated_date).format('D MMM YYYY')}
+                        </CTableDataCell>
+                        <CTableDataCell>
+                          {item.ongoing_date ? moment(item.ongoing_date).format('D MMM YYYY') : '-'}
+                        </CTableDataCell>
+                        <CTableDataCell>
+                          <CButton
+                            color="warning"
+                            variant="outline"
+                            shape="square"
+                            size="sm"
+                            className="me-1 mb-1"
+                            onClick={() => {
+                              changeStatusHandler(item)
+                            }}
+                          >
+                            Ganti Status
+                          </CButton>
+                          <CButton
+                            color="primary"
+                            variant="outline"
+                            shape="square"
+                            size="sm"
+                            className="mb-1"
+                            onClick={() => {
+                              invoiceDetailHandler(item)
+                            }}
+                          >
+                            Detail
+                          </CButton>
+                        </CTableDataCell>
+                      </CTableRow>
+                    ))}
+                </CTableBody>
+              </CTable>
+            </div>
             {!loading && invoiceList.length === 0 && (
               <div className="text-center text-danger">Belum ada data</div>
             )}
