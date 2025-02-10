@@ -132,7 +132,12 @@ const AddServiceModal = ({
       try {
         await addService({
           variables: {
-            input: { ...values, service_name: getServiceId._id, invoice_id, is_disc: isDisc },
+            input: {
+              ...values,
+              service_name: getServiceId._id,
+              invoice_id,
+              is_disc: isDisc,
+            },
           },
         })
         setRefreshTrigger(true)

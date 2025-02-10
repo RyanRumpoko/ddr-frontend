@@ -120,7 +120,7 @@ const Login = () => {
                     </CInputGroup>
                     <CRow>
                       <CCol sm="12">
-                        <CButton type="submit" color="primary" className="px-4 col-12">
+                        <CButton type="submit" color="primary" className="px-4 col-12 text-white">
                           Login
                         </CButton>
                       </CCol>
@@ -128,7 +128,7 @@ const Login = () => {
                   </CForm>
                   <CRow>
                     <CCol sm="12" className="mt-2">
-                      <span className="float-end">Ver. 1.2.2</span>
+                      <span className="float-end">Ver. 1.3.0</span>
                     </CCol>
                   </CRow>
                 </CCardBody>

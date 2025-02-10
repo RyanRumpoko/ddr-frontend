@@ -74,7 +74,7 @@ const AddSettingServiceModal = ({
         setValues({
           service_name: '',
           base_price: '0',
-          confirm_password: '',
+          service_type: '',
         })
         setRefreshTrigger(true)
         setSettingServiceModal(false)
