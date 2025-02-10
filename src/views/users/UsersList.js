@@ -75,7 +75,7 @@ const UsersList = () => {
         <CCol>
           <CRow className="justify-content-center">
             <CCol lg="6">
-              <CButton onClick={addNewUserModal} color="primary" className="mb-4 col-12">
+              <CButton onClick={addNewUserModal} color="primary" className="mb-4 col-12 text-white">
                 Tambah User Baru
               </CButton>
             </CCol>

@@ -15,6 +15,7 @@ const SettingService = React.lazy(() => import('./views/setting/SettingService')
 const SettingBrand = React.lazy(() => import('./views/setting/SettingBrand'))
 // Reports
 const Reports = React.lazy(() => import('./views/reports/Reports'))
+const ReportDetail = React.lazy(() => import('./views/reports/ReportDetail'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -29,6 +30,7 @@ const routes = [
   { path: '/setting/service', name: 'Setting Service', element: SettingService },
   { path: '/setting/brand', name: 'Setting Brand', element: SettingBrand },
   { path: '/reports', name: 'Reports', element: Reports },
+  { path: '/reports/detail', name: 'Report Detail', element: ReportDetail },
 ]
 
 export default routes

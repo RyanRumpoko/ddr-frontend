@@ -26,7 +26,6 @@ const GET_ALL_SETTING_SERVICE = gql`
     getAllSettingService {
       _id
       service_name
-      service_type
       base_price
     }
   }
@@ -137,7 +136,6 @@ const AddServiceModal = ({
             input: {
               ...values,
               service_name: getServiceId._id,
-              service_type: getServiceId.service_type,
               invoice_id,
               is_disc: isDisc,
             },

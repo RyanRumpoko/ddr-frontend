@@ -107,7 +107,11 @@ const SettingService = () => {
       <CCardBody>
         <CRow className="justify-content-center">
           <CCol lg="6">
-            <CButton onClick={addNewSettingService} color="primary" className="mb-4 col-12">
+            <CButton
+              onClick={addNewSettingService}
+              color="primary"
+              className="mb-4 col-12 text-white"
+            >
               Tambah Service
             </CButton>
           </CCol>
