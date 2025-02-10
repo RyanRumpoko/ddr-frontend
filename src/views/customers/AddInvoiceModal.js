@@ -28,7 +28,6 @@ const GET_ALL_SETTING_SERVICE = gql`
     getAllSettingService {
       _id
       service_name
-      service_type
       base_price
     }
   }
