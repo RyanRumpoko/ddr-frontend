@@ -41,7 +41,6 @@ const AddServiceModal = ({
 }) => {
   const [values, setValues] = useState({
     service_name: '',
-    service_type: '',
     quantity: 0,
     price: 0,
     total: 0,
