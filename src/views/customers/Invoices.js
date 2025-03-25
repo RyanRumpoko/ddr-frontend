@@ -123,6 +123,23 @@ const Invoices = () => {
 
     win.focus()
   }
+  const reviewHandler = () => {
+    let win
+    let text =
+      'Terima kasih telah servis kaki kaki mobil kesayangan anda di DDR Motor 126. Bila berkenan beri kami review di Google! Review Google Anda dapat membantu kami untuk terus memberikan pelayanan terbaik untuk Anda https://g.page/r/CSrs8qLbB7emEBE/review Terima kasih!'
+    let changeNumber
+    if (state.phone_number[0] === '0') {
+      changeNumber = '62' + state.phone_number.slice(1)
+    } else if (state.phone_number[0] === '6' && state.phone_number[1] === '2') {
+      changeNumber = state.phone_number
+    } else if (state.phone_number[0] !== '0') {
+      changeNumber = '62' + state.phone_number
+    }
+
+    win = window.open(`https://wa.me/${changeNumber}?text=${text}`, '_blank')
+
+    win.focus()
+  }
   if (refreshTrigger) {
     refetch()
     setRefreshTrigger(false)
@@ -144,10 +161,10 @@ const Invoices = () => {
         <CCard className="mt-3">
           <CCardHeader>
             <CRow className="d-flex align-items-center justify-content-center">
-              <CCol sm="8">
+              <CCol sm="6">
                 <h3>Detail Customer</h3>
               </CCol>
-              <CCol sm="4">
+              <CCol sm="6">
                 <CButton
                   color="warning"
                   className="float-end text-white ms-2 mb-1"
@@ -155,15 +172,6 @@ const Invoices = () => {
                   size="sm"
                 >
                   Edit Customer
-                </CButton>
-                <CButton
-                  color="success"
-                  className="float-end"
-                  variant="outline"
-                  size="sm"
-                  onClick={whatsappHandler}
-                >
-                  Whatsapp
                 </CButton>
               </CCol>
             </CRow>
@@ -205,6 +213,28 @@ const Invoices = () => {
                 </tbody>
               </table>
             )}
+            <CRow className="justify-content-center">
+              <CCol lg="6" className="text-end">
+                <CButton
+                  color="success"
+                  variant="outline"
+                  className="mb-2 col-lg-6 col-12"
+                  onClick={whatsappHandler}
+                >
+                  Whatsapp
+                </CButton>
+              </CCol>
+              <CCol lg="6" className="text-start">
+                <CButton
+                  color="danger"
+                  variant="outline"
+                  className="mb-2 col-lg-6 col-12"
+                  onClick={reviewHandler}
+                >
+                  Review
+                </CButton>
+              </CCol>
+            </CRow>
           </CCardBody>
         </CCard>
       </CCol>
