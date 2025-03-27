@@ -141,6 +141,7 @@ const Invoices = () => {
     win.focus()
   }
   if (refreshTrigger) {
+    // console.log("Masuk")
     refetch()
     setRefreshTrigger(false)
     if (isUpdateStatus) {
