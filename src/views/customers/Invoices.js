@@ -69,7 +69,7 @@ const Invoices = () => {
 
   let navigate = useNavigate()
 
-  const [getInvoices, { loading, refetch }] = useLazyQuery(GET_INVOICES_BY_CUSTOMER_ID, {
+  const [getInvoices, { loading }] = useLazyQuery(GET_INVOICES_BY_CUSTOMER_ID, {
     onCompleted: (data) => {
       setInvoiceList(data.getInvoiceByCustomerId)
     },
@@ -142,7 +142,11 @@ const Invoices = () => {
   }
   if (refreshTrigger) {
     // console.log("Masuk")
-    refetch()
+    getInvoices({
+      variables: {
+        id: state._id,
+      },
+    })
     setRefreshTrigger(false)
     if (isUpdateStatus) {
       toast.success('Status berhasil diubah')
