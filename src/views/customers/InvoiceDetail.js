@@ -203,15 +203,15 @@ const InvoiceDetail = () => {
     FileSaver.saveAs(data, fileName + fileExtension)
   }
   if (refreshTrigger) {
-    refetch()
-    setRefreshTrigger(false)
-    setIsDisc(false)
     toast.success('Invoice berhasil di update')
+    setIsDisc(false)
+    setRefreshTrigger(false)
+    refetch()
   }
   if (noteRefreshTrigger) {
-    refetchInvoice()
-    setNoteRefreshTrigger(false)
     toast.success('Note berhasil di update')
+    setNoteRefreshTrigger(false)
+    refetchInvoice()
   }
 
   return (

@@ -62,9 +62,9 @@ const UsersList = () => {
     navigate('/users/detail', { state: data })
   }
   if (refreshTrigger) {
-    refetch()
-    setRefreshTrigger(false)
     toast.success('User berhasil di buat')
+    setRefreshTrigger(false)
+    refetch()
   }
   return (
     <CCard>
